@@ -1,0 +1,29 @@
+---
+description: How to use available MCP servers and tools in this workspace
+alwaysApply: true
+---
+
+Available MCP servers and how to use them
+
+- memory: long-term project memory stored in Neo4j.
+  Use this server to store and retrieve stable project knowledge (architecture, domain concepts, environment definitions, standard commands).
+  Do not store passwords, API keys, tokens, or other secrets here.
+
+- duckduckgo: external web search.
+  Use this when you need up-to-date or external information that is not in the repo, docs, or memory.
+
+- github: access to GitHub repositories.
+  Use this to inspect and modify remote repositories only when I explicitly ask.
+  Never perform destructive operations (force pushes, branch deletes, tag deletes, mass file deletions) without my explicit confirmation.
+
+- playwright: browser automation and web page interaction.
+  Use this for end-to-end flows, scraping where allowed, and validating UI flows, instead of guessing page structure.
+
+- grafana: metrics and dashboards.
+  Use this server to query metrics, logs, and dashboards for debugging and performance investigations.
+  Treat all operations as read-only unless I explicitly approve a write/change operation.
+
+General policy
+- Prefer using these MCP tools instead of “simulating” their behavior in plain code or guesses.
+- Before using a tool that can change external state (GitHub, any write-capable server), explain what you plan to do and ask for confirmation.
+- Never expose or log secrets or sensitive data returned by MCP tools in your explanations.

@@ -1,0 +1,9 @@
+---
+description: Data import and validation rules
+globs:
+  - "data/**"
+alwaysApply: false
+---
+Process input files sequentially to control memory. Validate/coerce types explicitly.
+On irreparable records, skip and log to CSV with full original columns + timestamp,file,line,error.
+Emit metrics: rows_ok, rows_skipped, parse_errors. Ensure idempotent DB writes.
