@@ -53,6 +53,7 @@ ide_state.json
 extensions/
 projects/
 browser-logs/
+plans/
 
 # Plans directory (optional - uncomment to ignore)
 # plans/
