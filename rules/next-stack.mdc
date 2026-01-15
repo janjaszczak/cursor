@@ -1,0 +1,29 @@
+---
+description: Next.js App Router + Tailwind + shadcn/ui + TanStack Query + RHF + Zod + Prisma + conventions
+globs:
+  - "frontend/**"
+alwaysApply: false
+---
+Next.js (App Router)
+- Prefer Server Components; mark Client Components with "use client" only when interactivity/state is needed.
+- Fetch on the server by default (route handlers/server actions). Prisma is server-only (Node runtime), never import in client components.
+
+Styling & UI
+- Tailwind as default; use shadcn/ui under `frontend/components/ui/*`; keep a11y props intact.
+
+Data fetching
+- TanStack Query for client server-state and mutations; stable query keys, precise invalidation.
+- Prefer RSC for static/deterministic reads; React Query for live updates/mutations/optimistic flows.
+
+Forms & Validation
+- React Hook Form + Zod resolver; share a single Zod schema between server/client.
+
+State management
+- React Context for small cross-tree UI state only; server state stays in React Query.
+
+Conventions
+- AirBnB style (ESLint) + Prettier; React files PascalCase (`UserCard.tsx`), prefer **named exports**. Next route files (`page.tsx`/`layout.tsx`) follow framework rules.
+
+What to return in PRs
+- Runnable files + tests (Vitest/RTL for components, Playwright e2e for critical flows).
+- Short rationale showing how the change follows the stack and trade-offs.
