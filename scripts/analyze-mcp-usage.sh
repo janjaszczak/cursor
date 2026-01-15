@@ -55,9 +55,9 @@ echo "    1. Cursor logs (if available)"
 echo "    2. Manual testing of each server"
 echo "    3. Project documentation for server purposes"
 
-# Check for servers using wsl.exe (candidates for migration)
+# Check server commands
 echo ""
-echo "Servers using wsl.exe (candidates for Docker migration):"
+echo "Server execution methods:"
 python3 << 'PYEOF'
 import json
 import sys
@@ -68,10 +68,10 @@ try:
     
     for name, server in config.get('mcpServers', {}).items():
         command = server.get('command', '')
-        if command == 'wsl.exe':
-            print(f"  - {name}")
-        elif command == 'docker':
-            print(f"  [OK] {name} uses Docker")
+        if command == 'docker':
+            print(f"  ✓ {name} uses Docker")
+        else:
+            print(f"  ⚠ {name} uses unexpected command: {command} (expected: docker)")
 except Exception as e:
     pass
 PYEOF

@@ -42,14 +42,12 @@ foreach ($serverName in $servers) {
         $issues += "Server '$serverName' has no command configured"
     }
     
-    # Check if using wsl.exe (needs migration)
-    if ($server.command -eq "wsl.exe") {
-        Write-Host "  [INFO] $serverName uses wsl.exe - candidate for Docker migration" -ForegroundColor Cyan
-    }
-    
-    # Check if using docker (already migrated)
+    # Check if using docker (expected)
     if ($server.command -eq "docker") {
         Write-Host "  [OK] $serverName uses Docker" -ForegroundColor Green
+    } else {
+        $issues += "Server '$serverName' uses unexpected command: $($server.command) (expected: docker)"
+        Write-Host "  [WARN] $serverName uses unexpected command: $($server.command)" -ForegroundColor Yellow
     }
 }
 

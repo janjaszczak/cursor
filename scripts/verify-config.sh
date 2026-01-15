@@ -90,7 +90,7 @@ if docker --version >/dev/null 2>&1; then
     echo "  ✓ Docker is available"
     
     # Check Docker images for MCP servers
-    mcp_images=("mcp/grafana" "mcp/playwright" "mcp/duckduckgo" "mcp/memory")
+    mcp_images=("mcp/grafana" "mcp/playwright" "mcp/duckduckgo" "mcp/memory" "mcp/github" "mcp/shrimp")
     for image in "${mcp_images[@]}"; do
         if docker images "$image" --format "{{.Repository}}:{{.Tag}}" 2>/dev/null | grep -q .; then
             echo "    ✓ Image exists: $image"
@@ -106,14 +106,24 @@ else
     echo "  ✗ Docker is not available"
 fi
 
-# Check Shrimp installation
+# Check Shrimp Docker image and volume
 echo ""
 echo "Checking Shrimp Task Manager..."
-if [ -f "$HOME/mcp-shrimp-task-manager/dist/index.js" ]; then
-    echo "  ✓ Shrimp is installed"
+if docker images mcp/shrimp --format "{{.Repository}}:{{.Tag}}" 2>/dev/null | grep -q .; then
+    echo "  ✓ Shrimp Docker image exists: mcp/shrimp"
+elif docker manifest inspect mcp/shrimp >/dev/null 2>&1; then
+    echo "  ✓ Shrimp image available on Docker Hub: mcp/shrimp"
 else
-    warnings+=("Shrimp Task Manager not found")
-    echo "  ⚠ Shrimp not found"
+    warnings+=("Shrimp Docker image (mcp/shrimp) not found - needs build")
+    echo "  ⚠ Shrimp image not found - run: ./scripts/build-mcp-images.sh --shrimp"
+fi
+
+# Check if Docker volume exists
+if docker volume ls --format "{{.Name}}" | grep -q "^shrimp_data$"; then
+    echo "  ✓ Shrimp data volume exists: shrimp_data"
+else
+    warnings+=("Shrimp data volume (shrimp_data) not found - will be created on first run")
+    echo "  ℹ Shrimp volume will be created automatically on first run"
 fi
 
 # Check sync scripts

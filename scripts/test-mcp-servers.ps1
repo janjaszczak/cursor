@@ -146,9 +146,9 @@ foreach ($serverName in $servers) {
             Write-Host "  [INFO] Environment variables: $($envVars -join ', ')" -ForegroundColor Gray
             $testResults += @{ Server = $serverName; Test = "Env Vars"; Status = "PASS"; EnvVars = $envVars }
         }
-    } elseif ($command -eq "wsl.exe") {
-        Write-Host "  [INFO] Using wsl.exe (not migrated to Docker yet)" -ForegroundColor Gray
-        $testResults += @{ Server = $serverName; Test = "Migration Status"; Status = "INFO"; Message = "Still using wsl.exe" }
+    } else {
+        Write-Host "  [WARN] Unknown command: $command" -ForegroundColor Yellow
+        $testResults += @{ Server = $serverName; Test = "Command Check"; Status = "WARN"; Message = "Unknown command: $command" }
     }
 }
 

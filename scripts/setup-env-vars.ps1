@@ -1,6 +1,7 @@
 # Setup script for Windows environment variables
 # NOTE: Only CURSOR_CONFIG_DIR is needed in Windows!
-# All MCP servers run in WSL, so MCP environment variables (NEO4J_*, GITHUB_*, GRAFANA_*)
+# All MCP servers run in Docker containers, and Docker runs in WSL.
+# Therefore, MCP environment variables (NEO4J_*, GITHUB_*, GRAFANA_*)
 # should be set in WSL only (use scripts/setup-env-vars.sh)
 #
 # Run this script as Administrator to set CURSOR_CONFIG_DIR
@@ -21,7 +22,8 @@ if (-not $isAdmin) {
 Write-Host "Setting up Cursor environment variables (Windows)..." -ForegroundColor Cyan
 Write-Host ""
 Write-Host "NOTE: Only CURSOR_CONFIG_DIR is set in Windows." -ForegroundColor Yellow
-Write-Host "All MCP servers run in WSL, so MCP env vars are set in WSL only." -ForegroundColor Yellow
+Write-Host "All MCP servers run in Docker containers (Docker runs in WSL)." -ForegroundColor Yellow
+Write-Host "MCP env vars are set in WSL only." -ForegroundColor Yellow
 Write-Host "Run scripts/setup-env-vars.sh in WSL to set MCP environment variables." -ForegroundColor Cyan
 Write-Host ""
 

@@ -119,9 +119,9 @@ PYEOF
             echo "  ℹ Environment variables: $env_vars"
             test_results+=("$server_name:Env Vars:PASS:$env_vars")
         fi
-    elif [ "$command" = "wsl.exe" ]; then
-        echo "  ℹ Using wsl.exe (not migrated to Docker yet)"
-        test_results+=("$server_name:Migration Status:INFO:Still using wsl.exe")
+    else
+        echo "  ⚠ Unknown command: $command"
+        test_results+=("$server_name:Command Check:WARN:Unknown command: $command")
     fi
 done <<< "$servers"
 

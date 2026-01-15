@@ -12,11 +12,12 @@ echo ""
 
 # List of MCP servers to check
 declare -a servers=(
-    "grafana:mcp/grafana:grafana/grafana"
-    "github:github/github:"
-    "playwright:microsoft/playwright:"
+    "grafana:mcp/grafana:"
+    "github:mcp/github:"
+    "playwright:mcp/playwright:"
     "duckduckgo:mcp/duckduckgo:"
-    "memory:mcp/memory:mcp/neo4j-memory"
+    "memory:mcp/memory:"
+    "shrimp:mcp/shrimp:"
 )
 
 available_images=()

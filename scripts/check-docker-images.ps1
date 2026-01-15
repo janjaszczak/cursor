@@ -10,11 +10,12 @@ Write-Host ""
 
 # List of MCP servers to check
 $mcpServers = @(
-    @{ Name = "grafana"; Image = "mcp/grafana"; AltImage = "grafana/grafana"; Required = $true },
-    @{ Name = "github"; Image = "github/github"; AltImage = ""; Required = $true },
-    @{ Name = "playwright"; Image = "mcp/playwright"; AltImage = "microsoft/playwright"; Required = $true },
+    @{ Name = "grafana"; Image = "mcp/grafana"; AltImage = ""; Required = $true },
+    @{ Name = "github"; Image = "mcp/github"; AltImage = ""; Required = $true },
+    @{ Name = "playwright"; Image = "mcp/playwright"; AltImage = ""; Required = $true },
     @{ Name = "duckduckgo"; Image = "mcp/duckduckgo"; AltImage = ""; Required = $true },
-    @{ Name = "memory"; Image = "mcp/memory"; AltImage = "mcp/neo4j-memory"; Required = $true }
+    @{ Name = "memory"; Image = "mcp/memory"; AltImage = ""; Required = $true },
+    @{ Name = "shrimp"; Image = "mcp/shrimp"; AltImage = ""; Required = $true }
 )
 
 $results = @()

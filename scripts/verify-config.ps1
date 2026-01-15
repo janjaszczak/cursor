@@ -105,7 +105,7 @@ try {
         Write-Host "  [OK] Docker is available" -ForegroundColor Green
         
         # Check Docker images for MCP servers
-        $mcpImages = @("mcp/grafana", "mcp/playwright", "mcp/duckduckgo", "mcp/memory")
+        $mcpImages = @("mcp/grafana", "mcp/playwright", "mcp/duckduckgo", "mcp/memory", "mcp/github", "mcp/shrimp")
         foreach ($image in $mcpImages) {
             $imageCheck = docker images $image --format "{{.Repository}}:{{.Tag}}" 2>&1
             if ($LASTEXITCODE -eq 0 -and $imageCheck) {
@@ -130,19 +130,35 @@ try {
     Write-Host "  [ERROR] Cannot check Docker" -ForegroundColor Red
 }
 
-# Check Shrimp installation
+# Check Shrimp Docker image and volume
 Write-Host "`nChecking Shrimp Task Manager..." -ForegroundColor Yellow
 try {
-    $shrimpPath = wsl.exe -- bash -lc "test -f ~/mcp-shrimp-task-manager/dist/index.js && echo 'EXISTS' || echo 'MISSING'" 2>&1
-    if ($shrimpPath -match "EXISTS") {
-        Write-Host "  [OK] Shrimp is installed in WSL" -ForegroundColor Green
+    # Check if Docker image exists
+    $shrimpImage = docker images mcp/shrimp --format "{{.Repository}}:{{.Tag}}" 2>&1
+    if ($LASTEXITCODE -eq 0 -and $shrimpImage) {
+        Write-Host "  [OK] Shrimp Docker image exists: mcp/shrimp" -ForegroundColor Green
     } else {
-        $warnings += "Shrimp Task Manager not found in WSL"
-        Write-Host "  [WARN] Shrimp not found in WSL" -ForegroundColor Yellow
+        # Check if available on Docker Hub or needs build
+        $manifestCheck = docker manifest inspect mcp/shrimp 2>&1
+        if ($LASTEXITCODE -eq 0) {
+            Write-Host "  [OK] Shrimp image available on Docker Hub: mcp/shrimp" -ForegroundColor Green
+        } else {
+            $warnings += "Shrimp Docker image (mcp/shrimp) not found - needs build"
+            Write-Host "  [WARN] Shrimp image not found - run: .\scripts\build-mcp-images.ps1 --shrimp" -ForegroundColor Yellow
+        }
+    }
+    
+    # Check if Docker volume exists
+    $shrimpVolume = docker volume ls --format "{{.Name}}" | Select-String -Pattern "^shrimp_data$"
+    if ($shrimpVolume) {
+        Write-Host "  [OK] Shrimp data volume exists: shrimp_data" -ForegroundColor Green
+    } else {
+        $warnings += "Shrimp data volume (shrimp_data) not found - will be created on first run"
+        Write-Host "  [INFO] Shrimp volume will be created automatically on first run" -ForegroundColor Gray
     }
 } catch {
-    $warnings += "Cannot check Shrimp installation"
-        Write-Host "  [WARN] Cannot check Shrimp" -ForegroundColor Yellow
+    $warnings += "Cannot check Shrimp Docker setup"
+    Write-Host "  [WARN] Cannot check Shrimp" -ForegroundColor Yellow
 }
 
 # Check sync scripts
