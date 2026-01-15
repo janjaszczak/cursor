@@ -41,7 +41,7 @@ After setting, restart Cursor for changes to take effect.
 
 ### MCP Environment Variables
 
-**IMPORTANT:** All MCP servers run in WSL. On Windows, they execute via `wsl.exe` wrapper; in WSL, they run directly. MCP environment variables should be set **only in WSL**, not in Windows.
+**IMPORTANT:** All MCP servers run in WSL (via `wsl.exe`), so MCP environment variables should be set **only in WSL**, not in Windows.
 
 **Required variables (WSL only):**
 - `NEO4J_URI` - Neo4j connection URI (e.g., `neo4j://localhost:7687`)

@@ -1,43 +1,55 @@
 {
   "mcpServers": {
     "memory": {
-      "command": "bash",
+      "command": "wsl.exe",
       "args": [
+        "--",
+        "bash",
         "-lc",
         "npx -y @sylweriusz/mcp-neo4j-memory-server"
       ]
     },
     "playwright": {
-      "command": "bash",
+      "command": "wsl.exe",
       "args": [
+        "--",
+        "bash",
         "-lc",
         "npx @playwright/mcp@latest"
       ]
     },
     "duckduckgo": {
-      "command": "bash",
+      "command": "wsl.exe",
       "args": [
+        "--",
+        "bash",
         "-lc",
         "uvx duckduckgo-mcp-server"
       ]
     },
     "github": {
-      "command": "bash",
+      "command": "wsl.exe",
       "args": [
+        "--",
+        "bash",
         "-lc",
         "npx -y github-mcp-custom@1.0.20 stdio"
       ]
     },
     "grafana": {
-      "command": "bash",
+      "command": "wsl.exe",
       "args": [
+        "--",
+        "bash",
         "-lc",
         "docker run -i --rm -e GRAFANA_URL -e GRAFANA_API_KEY mcp/grafana --transport=stdio"
       ]
     },
     "shrimp-task-manager": {
-      "command": "bash",
+      "command": "wsl.exe",
       "args": [
+        "--",
+        "bash",
         "-lc",
         "node /home/janja/mcp-shrimp-task-manager/dist/index.js"
       ],

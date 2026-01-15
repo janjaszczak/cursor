@@ -43,8 +43,7 @@ All 6 MCP servers are configured and running:
 5. **grafana** - Metrics/dashboards (`mcp/grafana` Docker image)
 6. **shrimp-task-manager** - Task planning (local build at `~/mcp-shrimp-task-manager/`)
 
-**Windows:** All MCPs execute via WSL (`wsl.exe` wrapper) for consistency.
-**WSL:** MCPs execute directly using `bash` commands (no `wsl.exe` wrapper needed).
+All MCPs execute via WSL (`wsl.exe` wrapper) for consistency.
 
 ## Rules
 
