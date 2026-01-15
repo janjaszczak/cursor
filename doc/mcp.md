@@ -133,19 +133,61 @@ export GRAFANA_API_KEY="your_key"
 
 ## Execution Model
 
-All MCP servers are executed via `wsl.exe` wrapper:
+Most MCP servers are executed via Docker containers for consistency and isolation:
 
 ```json
 {
-  "command": "wsl.exe",
-  "args": ["--", "bash", "-lc", "npx -y package-name"]
+  "command": "docker",
+  "args": [
+    "run",
+    "-i",
+    "--rm",
+    "-e", "ENV_VAR_NAME",
+    "mcp/server-name",
+    "--transport=stdio"
+  ]
 }
 ```
 
-This ensures:
-- Consistent execution environment (WSL)
-- Access to WSL environment variables
-- Same behavior whether Cursor runs on Windows or WSL
+**Docker-based servers:**
+- **memory** (Neo4j) - `mcp/memory`
+- **playwright** - `mcp/playwright`
+- **duckduckgo** - `mcp/duckduckgo`
+- **grafana** - `mcp/grafana`
+
+**WSL-based servers (not yet migrated):**
+- **github** - Uses `wsl.exe` with `npx` (no official Docker image available)
+- **shrimp-task-manager** - Uses `wsl.exe` with local build (custom configuration)
+
+### Docker Hub MCP Catalog
+
+Most MCP server images are available from the [Docker Hub MCP Catalog](https://hub.docker.com/mcp). This provides:
+- **Official, maintained images** - Regularly updated by the community
+- **Consistent execution environment** - Same behavior on Windows and WSL
+- **Isolation** - Each server runs in its own container
+- **Easy updates** - Pull latest images with `docker pull`
+
+### Security: Environment Variables
+
+**IMPORTANT:** All secrets are passed via environment variables (`-e VAR_NAME`), never hardcoded in `mcp.json`.
+
+Environment variables must be set in WSL (where Docker runs):
+- `NEO4J_URI`, `NEO4J_USERNAME`, `NEO4J_PASSWORD`, `NEO4J_DATABASE`
+- `GRAFANA_URL`, `GRAFANA_API_KEY`
+- `GITHUB_PERSONAL_ACCESS_TOKEN` (for github server)
+
+### Custom Docker Images
+
+For servers without official Docker images, custom Dockerfiles are available in `docker/mcp-*/`:
+- `docker/mcp-memory/` - Neo4j Memory MCP Server
+- `docker/mcp-duckduckgo/` - DuckDuckGo MCP Server
+
+Build custom images with:
+```bash
+.\scripts\build-mcp-images.ps1 --all
+# or
+./scripts/build-mcp-images.sh --all
+```
 
 ## Security
 

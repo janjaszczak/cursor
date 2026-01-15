@@ -1,5 +1,5 @@
-# Universal MCP wrapper script for Windows and WSL/Ubuntu
-# Detects environment and runs command appropriately
+# Universal MCP wrapper script for Windows
+# Routes commands to WSL using bash wrapper
 # This PowerShell version is used when Cursor on Windows needs to execute MCP servers
 #
 # Usage: .\mcp-run.ps1 <command> [args...]
@@ -20,26 +20,17 @@ if ($Command.Count -eq 0) {
 # Join command parts into a single string
 $CommandString = $Command -join " "
 
-# Detect if we're running in WSL or Windows
-if ($env:WSL_DISTRO_NAME) {
-    # We're in WSL - use bash script directly
-    $scriptPath = "/home/janja/.cursor/scripts/mcp-run.sh"
-    if (Test-Path $scriptPath) {
-        bash $scriptPath $CommandString
-        exit $LASTEXITCODE
-    } else {
-        # Fallback: run directly via bash
-        bash -lc $CommandString
-        exit $LASTEXITCODE
-    }
-} elseif (Get-Command wsl.exe -ErrorAction SilentlyContinue) {
+# Always route through WSL using bash wrapper
+# The bash wrapper will detect if it's in WSL and run directly
+$wslScriptPath = "/home/janja/.cursor/scripts/mcp-run.sh"
+
+if (Get-Command wsl.exe -ErrorAction SilentlyContinue) {
     # We're on Windows - route through WSL using bash script
-    # Convert Windows path to WSL path if script path is provided as Windows path
-    $wslScriptPath = "/home/janja/.cursor/scripts/mcp-run.sh"
-    wsl.exe -- bash -c "$wslScriptPath '$CommandString'"
+    # Escape single quotes in command for bash
+    $escapedCommand = $CommandString -replace "'", "'\''"
+    wsl.exe -- bash -c "$wslScriptPath '$escapedCommand'"
     exit $LASTEXITCODE
 } else {
-    # Fallback: try to run directly (shouldn't happen in normal usage)
-    Write-Error "Error: Cannot determine environment. WSL not available."
+    Write-Error "Error: wsl.exe not available. Cannot route to WSL."
     exit 1
 }

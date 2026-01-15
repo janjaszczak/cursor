@@ -59,6 +59,31 @@ This configuration includes:
 
 See [doc/configuration.md](doc/configuration.md) for detailed setup instructions.
 
+### Cross-Platform Configuration
+
+The `mcp.json` file is configured to work seamlessly in both Windows and WSL environments. Most MCP servers use Docker containers from the [Docker Hub MCP Catalog](https://hub.docker.com/mcp), providing:
+- **Consistent execution** - Same behavior on Windows and WSL
+- **Isolation** - Each server runs in its own container
+- **Easy updates** - Pull latest images with `docker pull`
+- **Security** - All secrets via environment variables, never hardcoded
+
+**Docker-based servers:** memory, playwright, duckduckgo, grafana
+**WSL-based servers:** github, shrimp-task-manager (not yet migrated)
+
+### Testing MCP Servers
+
+Test all MCP servers with:
+- **Windows**: `.\scripts\test-mcp-servers.ps1`
+- **WSL**: `./scripts/test-mcp-servers.sh`
+
+This verifies:
+- Docker availability and image presence
+- Security (no hardcoded secrets)
+- Environment variable configuration
+- Server health checks
+
+See [doc/mcp.md](doc/mcp.md) for more details on the execution model and Docker setup.
+
 ## Understanding Duplicates
 
 **Why duplicates occur:** Cursor automatically creates a `.cursor/` directory in any folder you open. If you have:

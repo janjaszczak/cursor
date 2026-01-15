@@ -83,6 +83,29 @@ for var in "${required_vars[@]}"; do
     fi
 done
 
+# Check Docker availability
+echo ""
+echo "Checking Docker..."
+if docker --version >/dev/null 2>&1; then
+    echo "  ✓ Docker is available"
+    
+    # Check Docker images for MCP servers
+    mcp_images=("mcp/grafana" "mcp/playwright" "mcp/duckduckgo" "mcp/memory")
+    for image in "${mcp_images[@]}"; do
+        if docker images "$image" --format "{{.Repository}}:{{.Tag}}" 2>/dev/null | grep -q .; then
+            echo "    ✓ Image exists: $image"
+        elif docker manifest inspect "$image" >/dev/null 2>&1; then
+            echo "    ✓ Image available on Docker Hub: $image"
+        else
+            warnings+=("Docker image not found: $image")
+            echo "    ⚠ Image not found: $image"
+        fi
+    done
+else
+    errors+=("Docker is not available")
+    echo "  ✗ Docker is not available"
+fi
+
 # Check Shrimp installation
 echo ""
 echo "Checking Shrimp Task Manager..."

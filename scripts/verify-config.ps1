@@ -97,6 +97,39 @@ try {
         Write-Host "  [ERROR] Cannot test WSL" -ForegroundColor Red
 }
 
+# Check Docker availability
+Write-Host "`nChecking Docker..." -ForegroundColor Yellow
+try {
+    $dockerVersion = docker --version 2>&1
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "  [OK] Docker is available" -ForegroundColor Green
+        
+        # Check Docker images for MCP servers
+        $mcpImages = @("mcp/grafana", "mcp/playwright", "mcp/duckduckgo", "mcp/memory")
+        foreach ($image in $mcpImages) {
+            $imageCheck = docker images $image --format "{{.Repository}}:{{.Tag}}" 2>&1
+            if ($LASTEXITCODE -eq 0 -and $imageCheck) {
+                Write-Host "    [OK] Image exists: $image" -ForegroundColor Green
+            } else {
+                # Check if available on Docker Hub
+                $manifestCheck = docker manifest inspect $image 2>&1
+                if ($LASTEXITCODE -eq 0) {
+                    Write-Host "    [OK] Image available on Docker Hub: $image" -ForegroundColor Green
+                } else {
+                    $warnings += "Docker image not found: $image"
+                    Write-Host "    [WARN] Image not found: $image" -ForegroundColor Yellow
+                }
+            }
+        }
+    } else {
+        $errors += "Docker is not available"
+        Write-Host "  [ERROR] Docker is not available" -ForegroundColor Red
+    }
+} catch {
+    $errors += "Cannot check Docker: $_"
+    Write-Host "  [ERROR] Cannot check Docker" -ForegroundColor Red
+}
+
 # Check Shrimp installation
 Write-Host "`nChecking Shrimp Task Manager..." -ForegroundColor Yellow
 try {
