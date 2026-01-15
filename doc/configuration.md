@@ -19,7 +19,7 @@ Set this environment variable to point to the repo's `.cursor` directory:
 
 **Windows (PowerShell as Administrator):**
 ```powershell
-[Environment]::SetEnvironmentVariable("CURSOR_CONFIG_DIR", "C:\Users\janja\OneDrive\Dokumenty\GitHub\cursor\.cursor", "User")
+[Environment]::SetEnvironmentVariable("CURSOR_CONFIG_DIR", "C:\Users\janja\.cursor", "User")
 ```
 
 Or use the setup script:
@@ -29,7 +29,7 @@ Or use the setup script:
 
 **WSL (add to `~/.profile`):**
 ```bash
-export CURSOR_CONFIG_DIR="/mnt/c/Users/janja/OneDrive/Dokumenty/GitHub/cursor/.cursor"
+export CURSOR_CONFIG_DIR="$HOME/.cursor"
 ```
 
 Or use the setup script:
@@ -53,10 +53,10 @@ After setting, restart Cursor for changes to take effect.
 - `GRAFANA_API_KEY` - Grafana API key
 
 **Setting in WSL:**
-1. Edit `env.local` file with your actual secrets
+1. Edit `env.local` file with your actual secrets (located in `~/.cursor/env.local`)
 2. Run the setup script:
    ```bash
-   cd /mnt/c/Users/janja/OneDrive/Dokumenty/GitHub/cursor
+   cd ~/.cursor
    ./scripts/setup-env-vars.sh
    # Or with sudo for system-wide:
    sudo ./scripts/setup-env-vars.sh

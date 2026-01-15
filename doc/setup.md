@@ -4,22 +4,24 @@ This document describes the current state of the Cursor configuration setup.
 
 ## Configuration Location
 
-**Single source of truth:** `C:\Users\janja\OneDrive\Dokumenty\GitHub\cursor\.cursor\`
+**Single source of truth:** `C:\Users\janja\.cursor\` (Windows) / `~/.cursor/` (WSL)
 
 This directory contains:
 - `rules/` - Project rules (6 files)
 - `mcp.json` - MCP server configurations
 - `cli-config.json` - CLI permissions
-- `commands/` - Custom commands (2 files)
+- `commands/` - Custom commands (3 files)
+- `scripts/` - Utility scripts
+- `doc/` - Documentation
 
 ## Environment Variables
 
 ### Windows
-- `CURSOR_CONFIG_DIR` = `C:\Users\janja\OneDrive\Dokumenty\GitHub\cursor\.cursor`
+- `CURSOR_CONFIG_DIR` = `C:\Users\janja\.cursor`
   - Set via: `scripts/setup-env-vars.ps1` (as Administrator)
 
 ### WSL
-- `CURSOR_CONFIG_DIR` = `/mnt/c/Users/janja/OneDrive/Dokumenty/GitHub/cursor/.cursor`
+- `CURSOR_CONFIG_DIR` = `~/.cursor` or `$HOME/.cursor`
   - Set in: `~/.profile`
 - MCP environment variables (all in WSL):
   - `NEO4J_URI` = `neo4j://localhost:7687`
@@ -108,9 +110,10 @@ Available utility scripts:
 
 ## Git Repository
 
-**Remote:** `https://github.com/janjaszczak/cursor`
+**Location:** `C:\Users\janja\.cursor\` (Windows) / `~/.cursor/` (WSL)
+**Remote:** `https://github.com/janjaszczak/cursor-config.git` (to be configured)
 **Branch:** `main`
-**Sync:** Use `scripts/sync-repo.{ps1,sh}` to synchronize across machines
+**Sync:** Use `scripts/sync-repo.{ps1,sh}` to synchronize between Windows and WSL via GitHub
 
 ## Verification
 

@@ -6,7 +6,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-$repoPath = "C:\Users\janja\OneDrive\Dokumenty\GitHub\cursor"
+$repoPath = "C:\Users\janja\.cursor"
 
 Push-Location $repoPath
 
@@ -20,10 +20,22 @@ try {
         exit 1
     }
 
+    # Check if remote is configured
+    $remoteExists = git remote get-url origin 2>$null
+    if (-not $remoteExists) {
+        Write-Host "No remote 'origin' configured. Use 'git remote add origin <url>' first." -ForegroundColor Yellow
+        exit 1
+    }
+
     Write-Host "Fetching from remote..." -ForegroundColor Cyan
     git fetch origin
 
     $currentBranch = git rev-parse --abbrev-ref HEAD
+    if (-not $currentBranch) {
+        Write-Host "No branch checked out. Creating 'main' branch..." -ForegroundColor Yellow
+        git checkout -b main
+        $currentBranch = "main"
+    }
     Write-Host "Current branch: $currentBranch" -ForegroundColor Cyan
 
     # Check if we're behind remote
@@ -41,7 +53,14 @@ try {
             git push origin $currentBranch
         }
     } else {
-        Write-Host "Repository is up to date." -ForegroundColor Green
+        # Push local commits if we're ahead
+        $ahead = git rev-list --count "origin/$currentBranch..HEAD" 2>$null
+        if ($ahead -gt 0) {
+            Write-Host "Pushing local commits..." -ForegroundColor Cyan
+            git push origin $currentBranch
+        } else {
+            Write-Host "Repository is up to date." -ForegroundColor Green
+        }
     }
 
     Write-Host "`nSync completed successfully." -ForegroundColor Green

@@ -4,7 +4,9 @@ This repository serves as the **single source of truth** for Cursor IDE configur
 
 ## Quick Start
 
-1. **Set `CURSOR_CONFIG_DIR`** to point to this repo's `.cursor` directory
+1. **Set `CURSOR_CONFIG_DIR`** to point to this user directory:
+   - Windows: `C:\Users\janja\.cursor`
+   - WSL: `~/.cursor`
 2. **Configure MCP environment variables** in WSL (see [doc/configuration.md](doc/configuration.md))
 3. **Restart Cursor** to apply changes
 
@@ -22,17 +24,17 @@ All documentation is in the **[doc/](doc/)** directory:
 ## Project Structure
 
 ```
-cursor/
-├── .cursor/              # Cursor configuration (single source of truth)
-│   ├── rules/            # Project rules and conventions
-│   ├── mcp.json          # MCP server configurations
-│   └── cli-config.json   # CLI permissions
-├── scripts/              # Setup and utility scripts
+~/.cursor/                # User Cursor configuration (single source of truth)
+├── rules/                # Project rules and conventions
+├── mcp.json              # MCP server configurations
+├── cli-config.json        # CLI permissions
+├── commands/             # Custom commands
+├── scripts/               # Setup and utility scripts
 │   ├── setup-env-vars.*  # Environment variable setup
 │   ├── sync-repo.*       # Git repository synchronization
 │   ├── verify-config.*   # Configuration verification
 │   └── fix-mcp-duplicates.*  # Fix MCP duplicate issues
-├── env.local             # Environment variables (secrets)
+├── doc/                  # Documentation
 ├── env.local.example     # Template for env.local
 └── README.md             # This file
 ```
@@ -66,7 +68,7 @@ See [doc/configuration.md](doc/configuration.md) for detailed setup instructions
 
 Cursor may load configurations from multiple locations, causing duplicates.
 
-**Solution:** Use `CURSOR_CONFIG_DIR` to point to a single source of truth (this repo's `.cursor/`), and minimize global configs to empty `mcpServers: {}`.
+**Solution:** Use `CURSOR_CONFIG_DIR` to point to a single source of truth (user `.cursor/` directory), and minimize global configs to empty `mcpServers: {}`.
 
 This principle applies to **all Cursor configuration** (rules, MCP, CLI config), not just MCP servers.
 

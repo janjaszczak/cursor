@@ -37,7 +37,6 @@ tmp/
 
 # Data files
 *.csv
-*.json
 *.parquet
 !package.json
 !tsconfig.json
@@ -46,3 +45,14 @@ tmp/
 .env
 .env.local
 env.local
+
+# Cursor IDE files (not tracked)
+ai-tracking/
+argv.json
+ide_state.json
+extensions/
+projects/
+browser-logs/
+
+# Plans directory (optional - uncomment to ignore)
+# plans/

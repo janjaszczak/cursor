@@ -25,16 +25,16 @@ else
     echo "  ✗ CURSOR_CONFIG_DIR is not set"
 fi
 
-# Check repo .cursor directory
+# Check user .cursor directory
 echo ""
-echo "Checking repo .cursor directory..."
-REPO_CURSOR_PATH="/mnt/c/Users/janja/OneDrive/Dokumenty/GitHub/cursor/.cursor"
-if [ -d "$REPO_CURSOR_PATH" ]; then
-    echo "  ✓ Repo .cursor directory exists"
+echo "Checking user .cursor directory..."
+USER_CURSOR_PATH="$HOME/.cursor"
+if [ -d "$USER_CURSOR_PATH" ]; then
+    echo "  ✓ User .cursor directory exists"
     
     # Check for required files
     for file in mcp.json cli-config.json; do
-        if [ -f "$REPO_CURSOR_PATH/$file" ]; then
+        if [ -f "$USER_CURSOR_PATH/$file" ]; then
             echo "    ✓ $file exists"
         else
             errors+=("Required file missing: $file")
@@ -43,16 +43,16 @@ if [ -d "$REPO_CURSOR_PATH" ]; then
     done
     
     # Check rules directory
-    if [ -d "$REPO_CURSOR_PATH/rules" ]; then
-        rule_count=$(find "$REPO_CURSOR_PATH/rules" -name "*.mdc" | wc -l)
+    if [ -d "$USER_CURSOR_PATH/rules" ]; then
+        rule_count=$(find "$USER_CURSOR_PATH/rules" -name "*.mdc" | wc -l)
         echo "    ✓ Rules directory exists ($rule_count rules)"
     else
         warnings+=("Rules directory not found")
         echo "    ⚠ Rules directory not found"
     fi
 else
-    errors+=("Repo .cursor directory does not exist")
-    echo "  ✗ Repo .cursor directory does not exist"
+    errors+=("User .cursor directory does not exist")
+    echo "  ✗ User .cursor directory does not exist"
 fi
 
 # Check environment variables
@@ -96,8 +96,8 @@ fi
 # Check sync scripts
 echo ""
 echo "Checking sync scripts..."
-REPO_ROOT="/mnt/c/Users/janja/OneDrive/Dokumenty/GitHub/cursor"
-for script in "$REPO_ROOT/scripts/sync-repo.ps1" "$REPO_ROOT/scripts/sync-repo.sh"; do
+USER_CURSOR_PATH="$HOME/.cursor"
+for script in "$USER_CURSOR_PATH/scripts/sync-repo.ps1" "$USER_CURSOR_PATH/scripts/sync-repo.sh"; do
     if [ -f "$script" ]; then
         echo "  ✓ $(basename $script) exists"
     else

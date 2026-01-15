@@ -7,11 +7,11 @@ set -e
 echo "=== Fixing MCP Configuration Duplicates ==="
 echo ""
 
-REPO_CONFIG_PATH="/mnt/c/Users/janja/OneDrive/Dokumenty/GitHub/cursor/.cursor/mcp.json"
+REPO_CONFIG_PATH="$HOME/.cursor/mcp.json"
 GLOBAL_CONFIG_PATH="$HOME/.cursor/mcp.json"
 
 # Ensure CURSOR_CONFIG_DIR is set in ~/.profile
-CURSOR_CONFIG_DIR="/mnt/c/Users/janja/OneDrive/Dokumenty/GitHub/cursor/.cursor"
+CURSOR_CONFIG_DIR="$HOME/.cursor"
 
 if ! grep -q "CURSOR_CONFIG_DIR" ~/.profile 2>/dev/null; then
     echo "export CURSOR_CONFIG_DIR=\"$CURSOR_CONFIG_DIR\"" >> ~/.profile
@@ -34,7 +34,7 @@ else
     echo "⚠ Global mcp.json not found (this is OK)"
 fi
 
-# Verify repo config exists
+# Verify user config exists
 if [ -f "$REPO_CONFIG_PATH" ]; then
     MCP_COUNT=$(python3 << 'PYEOF'
 import json
@@ -54,14 +54,14 @@ PYEOF
     MCP_NAMES=$(echo "$MCP_COUNT" | tail -1)
     
     if [ "$MCP_COUNT_ONLY" -gt 0 ]; then
-        echo "✓ Repo mcp.json found with $MCP_COUNT_ONLY MCP servers"
+        echo "✓ User mcp.json found with $MCP_COUNT_ONLY MCP servers"
         echo "  MCPs: $MCP_NAMES"
     else
-        echo "✗ Repo mcp.json has errors: $MCP_NAMES"
+        echo "✗ User mcp.json has errors: $MCP_NAMES"
         exit 1
     fi
 else
-    echo "✗ Repo mcp.json not found!"
+    echo "✗ User mcp.json not found!"
     exit 1
 fi
 
@@ -69,7 +69,7 @@ echo ""
 echo "=== Summary ==="
 echo "1. CURSOR_CONFIG_DIR added to ~/.profile"
 echo "2. Global mcp.json minimized (backed up)"
-echo "3. Repo mcp.json is the single source of truth"
+echo "3. User mcp.json is the single source of truth"
 echo ""
 echo "Next steps:"
 echo "1. Run: source ~/.profile (or restart terminal)"

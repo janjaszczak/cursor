@@ -23,16 +23,16 @@ if ($cursorConfigDir) {
     Write-Host "  ✗ CURSOR_CONFIG_DIR is not set" -ForegroundColor Red
 }
 
-# Check repo .cursor directory
-Write-Host "`nChecking repo .cursor directory..." -ForegroundColor Yellow
-$repoCursorPath = "C:\Users\janja\OneDrive\Dokumenty\GitHub\cursor\.cursor"
-if (Test-Path $repoCursorPath) {
-    Write-Host "  ✓ Repo .cursor directory exists" -ForegroundColor Green
+# Check user .cursor directory
+Write-Host "`nChecking user .cursor directory..." -ForegroundColor Yellow
+$userCursorPath = "C:\Users\janja\.cursor"
+if (Test-Path $userCursorPath) {
+    Write-Host "  ✓ User .cursor directory exists" -ForegroundColor Green
     
     # Check for required files
     $requiredFiles = @("mcp.json", "cli-config.json")
     foreach ($file in $requiredFiles) {
-        $filePath = Join-Path $repoCursorPath $file
+        $filePath = Join-Path $userCursorPath $file
         if (Test-Path $filePath) {
             Write-Host "    ✓ $file exists" -ForegroundColor Green
         } else {
@@ -42,7 +42,7 @@ if (Test-Path $repoCursorPath) {
     }
     
     # Check rules directory
-    $rulesPath = Join-Path $repoCursorPath "rules"
+    $rulesPath = Join-Path $userCursorPath "rules"
     if (Test-Path $rulesPath) {
         $ruleCount = (Get-ChildItem $rulesPath -Filter "*.mdc").Count
         Write-Host "    ✓ Rules directory exists ($ruleCount rules)" -ForegroundColor Green
@@ -51,8 +51,8 @@ if (Test-Path $repoCursorPath) {
         Write-Host "    ⚠ Rules directory not found" -ForegroundColor Yellow
     }
 } else {
-    $errors += "Repo .cursor directory does not exist"
-    Write-Host "  ✗ Repo .cursor directory does not exist" -ForegroundColor Red
+    $errors += "User .cursor directory does not exist"
+    Write-Host "  ✗ User .cursor directory does not exist" -ForegroundColor Red
 }
 
 # Check environment variables

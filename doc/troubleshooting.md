@@ -28,20 +28,20 @@ This principle applies to **all Cursor configuration** (rules, MCP, CLI config),
 
 Run as Administrator:
 ```powershell
-cd C:\Users\janja\OneDrive\Dokumenty\GitHub\cursor
+cd C:\Users\janja\.cursor
 .\scripts\fix-mcp-duplicates.ps1
 ```
 
 This script will:
-- Set `CURSOR_CONFIG_DIR` to point to repo `.cursor` directory
+- Set `CURSOR_CONFIG_DIR` to point to user `.cursor` directory
 - Backup and minimize global `%USERPROFILE%\.cursor\mcp.json`
-- Verify repo config is correct
+- Verify user config is correct
 
 **Step 2: Fix WSL Configuration**
 
 In WSL terminal:
 ```bash
-cd /mnt/c/Users/janja/OneDrive/Dokumenty/GitHub/cursor
+cd ~/.cursor
 ./scripts/fix-mcp-duplicates.sh
 source ~/.profile
 ```
@@ -49,7 +49,7 @@ source ~/.profile
 This script will:
 - Add `CURSOR_CONFIG_DIR` to `~/.profile`
 - Backup and minimize global `~/.cursor/mcp.json`
-- Verify repo config is correct
+- Verify user config is correct
 
 **Step 3: Set Environment Variables**
 
@@ -89,7 +89,7 @@ This sets all MCP environment variables in WSL (where MCPs actually run).
 
 ### Expected Result
 
-- **Single source of truth**: Only repo `.cursor/mcp.json` contains MCP definitions
+- **Single source of truth**: Only user `.cursor/mcp.json` contains MCP definitions
 - **No duplicates**: Global configs are minimized (empty `mcpServers`)
 - **All MCPs working**: All 6 MCPs should be active
 - **WSL accessible**: MCPs run via WSL even from Windows
@@ -102,11 +102,11 @@ This sets all MCP environment variables in WSL (where MCPs actually run).
 2. Verify global configs are minimized (should have empty `mcpServers`)
 3. Restart Cursor completely (close all processes)
 
-### Cursor not loading repo config
+### Cursor not loading user config
 
 1. Verify `CURSOR_CONFIG_DIR` is set correctly
 2. Restart Cursor completely
-3. Check that `.cursor/` directory exists in repo root
+3. Check that `.cursor/` directory exists in user home directory
 
 ### MCP servers not starting
 
@@ -118,7 +118,7 @@ This sets all MCP environment variables in WSL (where MCPs actually run).
 
 1. Check environment variables are set (run verify script)
 2. Verify WSL is accessible: `wsl.exe -- echo "WSL_OK"`
-3. Check MCP server paths in repo `mcp.json` are correct
+3. Check MCP server paths in user `mcp.json` are correct
 
 ### WSL shows no MCPs?
 

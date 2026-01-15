@@ -26,7 +26,7 @@ Write-Host "Run scripts/setup-env-vars.sh in WSL to set MCP environment variable
 Write-Host ""
 
 # CURSOR_CONFIG_DIR - only variable needed in Windows
-$cursorConfigDir = "C:\Users\janja\OneDrive\Dokumenty\GitHub\cursor\.cursor"
+$cursorConfigDir = "C:\Users\janja\.cursor"
 [Environment]::SetEnvironmentVariable("CURSOR_CONFIG_DIR", $cursorConfigDir, "User")
 Write-Host "[OK] CURSOR_CONFIG_DIR set to: $cursorConfigDir" -ForegroundColor Green
 
