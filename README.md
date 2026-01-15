@@ -14,12 +14,10 @@ This repository serves as the **single source of truth** for Cursor IDE configur
 
 All documentation is in the **[doc/](doc/)** directory:
 
-- **[doc/configuration.md](doc/configuration.md)** - Complete configuration guide (start here)
-- **[doc/mcp.md](doc/mcp.md)** - MCP server configuration, usage, and updates
+- **[doc/configuration.md](doc/configuration.md)** - Complete configuration guide and current setup (start here)
+- **[doc/mcp.md](doc/mcp.md)** - MCP server configuration, Docker management, and troubleshooting
 - **[doc/rules.md](doc/rules.md)** - Project rules and conventions
 - **[doc/commands.md](doc/commands.md)** - Custom Cursor commands
-- **[doc/setup.md](doc/setup.md)** - Current setup state
-- **[doc/troubleshooting.md](doc/troubleshooting.md)** - Troubleshooting guide
 
 ## Project Structure
 
@@ -81,7 +79,7 @@ This verifies:
 - Environment variable configuration
 - Server health checks
 
-See [doc/mcp.md](doc/mcp.md) for server details and usage, and [doc/mcp-docker.md](doc/mcp-docker.md) for Docker-specific operations.
+See [doc/mcp.md](doc/mcp.md) for complete MCP documentation including Docker management.
 
 ## Understanding Duplicates
 
@@ -96,10 +94,9 @@ Cursor may load configurations from multiple locations, causing duplicates.
 
 This principle applies to **all Cursor configuration** (rules, MCP, CLI config), not just MCP servers.
 
-See [doc/troubleshooting.md](doc/troubleshooting.md) for detailed fix instructions.
+See [doc/configuration.md](doc/configuration.md) for fixing duplicate issues.
 
 ## Getting Help
 
-- **Configuration**: See [doc/configuration.md](doc/configuration.md)
-- **Troubleshooting**: See [doc/troubleshooting.md](doc/troubleshooting.md)
-- **MCP details**: See [doc/mcp.md](doc/mcp.md)
+- **Configuration and Setup**: See [doc/configuration.md](doc/configuration.md)
+- **MCP Servers**: See [doc/mcp.md](doc/mcp.md)
