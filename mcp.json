@@ -1,56 +1,38 @@
 {
   "mcpServers": {
     "memory": {
-      "command": "wsl.exe",
+      "command": "/home/janja/.cursor/scripts/mcp-run.sh",
       "args": [
-        "--",
-        "bash",
-        "-lc",
         "npx -y @sylweriusz/mcp-neo4j-memory-server"
       ]
     },
     "playwright": {
-      "command": "wsl.exe",
+      "command": "/home/janja/.cursor/scripts/mcp-run.sh",
       "args": [
-        "--",
-        "bash",
-        "-lc",
         "npx @playwright/mcp@latest"
       ]
     },
     "duckduckgo": {
-      "command": "wsl.exe",
+      "command": "/home/janja/.cursor/scripts/mcp-run.sh",
       "args": [
-        "--",
-        "bash",
-        "-lc",
         "uvx duckduckgo-mcp-server"
       ]
     },
     "github": {
-      "command": "wsl.exe",
+      "command": "/home/janja/.cursor/scripts/mcp-run.sh",
       "args": [
-        "--",
-        "bash",
-        "-lc",
         "npx -y github-mcp-custom@1.0.20 stdio"
       ]
     },
     "grafana": {
-      "command": "wsl.exe",
+      "command": "/home/janja/.cursor/scripts/mcp-run.sh",
       "args": [
-        "--",
-        "bash",
-        "-lc",
         "docker run -i --rm -e GRAFANA_URL -e GRAFANA_API_KEY mcp/grafana --transport=stdio"
       ]
     },
     "shrimp-task-manager": {
-      "command": "wsl.exe",
+      "command": "/home/janja/.cursor/scripts/mcp-run.sh",
       "args": [
-        "--",
-        "bash",
-        "-lc",
         "node /home/janja/mcp-shrimp-task-manager/dist/index.js"
       ],
       "env": {
