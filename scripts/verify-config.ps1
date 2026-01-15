@@ -13,31 +13,31 @@ Write-Host "Checking CURSOR_CONFIG_DIR..." -ForegroundColor Yellow
 $cursorConfigDir = [Environment]::GetEnvironmentVariable("CURSOR_CONFIG_DIR", "User")
 if ($cursorConfigDir) {
     if (Test-Path $cursorConfigDir) {
-        Write-Host "  ✓ CURSOR_CONFIG_DIR is set: $cursorConfigDir" -ForegroundColor Green
+        Write-Host "  [OK] CURSOR_CONFIG_DIR is set: $cursorConfigDir" -ForegroundColor Green
     } else {
         $errors += "CURSOR_CONFIG_DIR points to non-existent path: $cursorConfigDir"
-        Write-Host "  ✗ CURSOR_CONFIG_DIR path does not exist" -ForegroundColor Red
+        Write-Host "  [ERROR] CURSOR_CONFIG_DIR path does not exist" -ForegroundColor Red
     }
 } else {
     $errors += "CURSOR_CONFIG_DIR is not set"
-    Write-Host "  ✗ CURSOR_CONFIG_DIR is not set" -ForegroundColor Red
+        Write-Host "  [ERROR] CURSOR_CONFIG_DIR is not set" -ForegroundColor Red
 }
 
 # Check user .cursor directory
 Write-Host "`nChecking user .cursor directory..." -ForegroundColor Yellow
 $userCursorPath = "C:\Users\janja\.cursor"
 if (Test-Path $userCursorPath) {
-    Write-Host "  ✓ User .cursor directory exists" -ForegroundColor Green
+    Write-Host "  [OK] User .cursor directory exists" -ForegroundColor Green
     
     # Check for required files
     $requiredFiles = @("mcp.json", "cli-config.json")
     foreach ($file in $requiredFiles) {
         $filePath = Join-Path $userCursorPath $file
         if (Test-Path $filePath) {
-            Write-Host "    ✓ $file exists" -ForegroundColor Green
+            Write-Host "    [OK] $file exists" -ForegroundColor Green
         } else {
             $errors += "Required file missing: $file"
-            Write-Host "    ✗ $file missing" -ForegroundColor Red
+            Write-Host "    [ERROR] $file missing" -ForegroundColor Red
         }
     }
     
@@ -45,14 +45,14 @@ if (Test-Path $userCursorPath) {
     $rulesPath = Join-Path $userCursorPath "rules"
     if (Test-Path $rulesPath) {
         $ruleCount = (Get-ChildItem $rulesPath -Filter "*.mdc").Count
-        Write-Host "    ✓ Rules directory exists ($ruleCount rules)" -ForegroundColor Green
+        Write-Host "    [OK] Rules directory exists ($ruleCount rules)" -ForegroundColor Green
     } else {
         $warnings += "Rules directory not found"
-        Write-Host "    ⚠ Rules directory not found" -ForegroundColor Yellow
+        Write-Host "    [WARN] Rules directory not found" -ForegroundColor Yellow
     }
 } else {
     $errors += "User .cursor directory does not exist"
-    Write-Host "  ✗ User .cursor directory does not exist" -ForegroundColor Red
+    Write-Host "  [ERROR] User .cursor directory does not exist" -ForegroundColor Red
 }
 
 # Check environment variables
@@ -72,13 +72,13 @@ foreach ($var in $requiredEnvVars) {
     if ($value) {
         if ($value -match "^<SET_FROM_KEEPASS>|^$") {
             $warnings += "$var is not set (placeholder or empty)"
-            Write-Host "  ⚠ $var is not set (needs KeePass)" -ForegroundColor Yellow
+            Write-Host "  [WARN] $var is not set (needs KeePass)" -ForegroundColor Yellow
         } else {
-            Write-Host "  ✓ $var is set" -ForegroundColor Green
+            Write-Host "  [OK] $var is set" -ForegroundColor Green
         }
     } else {
         $warnings += "$var is not set"
-        Write-Host "  ⚠ $var is not set" -ForegroundColor Yellow
+            Write-Host "  [WARN] $var is not set" -ForegroundColor Yellow
     }
 }
 
@@ -87,14 +87,14 @@ Write-Host "`nChecking WSL accessibility..." -ForegroundColor Yellow
 try {
     $wslTest = wsl.exe -- bash -lc "echo 'WSL_OK'" 2>&1
     if ($wslTest -match "WSL_OK") {
-        Write-Host "  ✓ WSL is accessible" -ForegroundColor Green
+        Write-Host "  [OK] WSL is accessible" -ForegroundColor Green
     } else {
         $errors += "WSL is not accessible"
-        Write-Host "  ✗ WSL is not accessible" -ForegroundColor Red
+        Write-Host "  [ERROR] WSL is not accessible" -ForegroundColor Red
     }
 } catch {
     $errors += "Cannot test WSL: $_"
-    Write-Host "  ✗ Cannot test WSL" -ForegroundColor Red
+        Write-Host "  [ERROR] Cannot test WSL" -ForegroundColor Red
 }
 
 # Check Shrimp installation
@@ -102,44 +102,47 @@ Write-Host "`nChecking Shrimp Task Manager..." -ForegroundColor Yellow
 try {
     $shrimpPath = wsl.exe -- bash -lc "test -f ~/mcp-shrimp-task-manager/dist/index.js && echo 'EXISTS' || echo 'MISSING'" 2>&1
     if ($shrimpPath -match "EXISTS") {
-        Write-Host "  ✓ Shrimp is installed in WSL" -ForegroundColor Green
+        Write-Host "  [OK] Shrimp is installed in WSL" -ForegroundColor Green
     } else {
         $warnings += "Shrimp Task Manager not found in WSL"
-        Write-Host "  ⚠ Shrimp not found in WSL" -ForegroundColor Yellow
+        Write-Host "  [WARN] Shrimp not found in WSL" -ForegroundColor Yellow
     }
 } catch {
     $warnings += "Cannot check Shrimp installation"
-    Write-Host "  ⚠ Cannot check Shrimp" -ForegroundColor Yellow
+        Write-Host "  [WARN] Cannot check Shrimp" -ForegroundColor Yellow
 }
 
 # Check sync scripts
 Write-Host "`nChecking sync scripts..." -ForegroundColor Yellow
-$syncScripts = @("scripts\sync-repo.ps1", "scripts\sync-repo.sh")
+$syncScripts = @(
+    (Join-Path $userCursorPath "scripts\sync-repo.ps1"),
+    (Join-Path $userCursorPath "scripts\sync-repo.sh")
+)
 foreach ($script in $syncScripts) {
     if (Test-Path $script) {
-        Write-Host "  ✓ $script exists" -ForegroundColor Green
+        Write-Host "  [OK] $(Split-Path $script -Leaf) exists" -ForegroundColor Green
     } else {
-        $warnings += "Sync script missing: $script"
-        Write-Host "  ⚠ $script missing" -ForegroundColor Yellow
+        $warnings += "Sync script missing: $(Split-Path $script -Leaf)"
+        Write-Host "  [WARN] $(Split-Path $script -Leaf) missing" -ForegroundColor Yellow
     }
 }
 
 # Summary
 Write-Host "`n=== Verification Summary ===" -ForegroundColor Cyan
 if ($errors.Count -eq 0 -and $warnings.Count -eq 0) {
-    Write-Host "✓ All checks passed!" -ForegroundColor Green
+    Write-Host "[OK] All checks passed!" -ForegroundColor Green
     exit 0
 } else {
     if ($errors.Count -gt 0) {
         Write-Host "`nErrors ($($errors.Count)):" -ForegroundColor Red
         foreach ($error in $errors) {
-            Write-Host "  ✗ $error" -ForegroundColor Red
+            Write-Host "  [ERROR] $error" -ForegroundColor Red
         }
     }
     if ($warnings.Count -gt 0) {
         Write-Host "`nWarnings ($($warnings.Count)):" -ForegroundColor Yellow
         foreach ($warning in $warnings) {
-            Write-Host "  ⚠ $warning" -ForegroundColor Yellow
+            Write-Host "  [WARN] $warning" -ForegroundColor Yellow
         }
     }
     exit 1
