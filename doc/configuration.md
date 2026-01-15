@@ -140,9 +140,11 @@ Available utility scripts:
 - `verify-config.sh` - Configuration verification
 - `fix-mcp-duplicates.sh` - Fix MCP duplicate issues
 
-**MCP Wrappers:**
-- `mcp-run-npx.{ps1,sh}` - For npx-based MCPs
-- `mcp-run-node.{ps1,sh}` - For node-based MCPs
-- `mcp-run-uvx.{ps1,sh}` - For uvx-based MCPs
-- `mcp-run-docker.{ps1,sh}` - For Docker-based MCPs
-- `mcp-run-shrimp.{ps1,sh}` - For Shrimp Task Manager
+**MCP Management Scripts:**
+- `build-mcp-images.{ps1,sh}` - Build custom Docker images
+- `test-mcp-servers.{ps1,sh}` - Test MCP server configuration
+- `check-docker-images.{ps1,sh}` - Check Docker image availability
+- `analyze-mcp-usage.{ps1,sh}` - Analyze MCP server usage
+- `generate-mcp-config.{ps1,sh}` - Generate mcp.json dynamically
+
+**Note:** Legacy MCP wrapper scripts have been archived. All MCP servers now use Docker for cross-platform consistency.

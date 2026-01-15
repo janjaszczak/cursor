@@ -148,10 +148,56 @@ If an image is not found:
 4. **Rotate secrets regularly**
 5. **Use `.env.local`** for local development (not committed to Git)
 
+## Rollback Plan
+
+If you need to revert to the previous configuration (WSL-based execution):
+
+### Quick Rollback
+
+1. **Restore from backup:**
+   ```bash
+   # Windows
+   Copy-Item "$env:USERPROFILE\.cursor\mcp.json.backup.*" "$env:USERPROFILE\.cursor\mcp.json" -Force
+   
+   # WSL
+   cp ~/.cursor/mcp.json.backup.* ~/.cursor/mcp.json
+   ```
+
+2. **Restore wrapper scripts (if needed):**
+   ```bash
+   # Windows
+   Copy-Item "$env:USERPROFILE\.cursor\scripts\archive\mcp-run-*.ps1" "$env:USERPROFILE\.cursor\scripts\" -Force
+   
+   # WSL
+   cp ~/.cursor/scripts/archive/mcp-run-*.sh ~/.cursor/scripts/
+   ```
+
+3. **Restart Cursor** to apply changes
+
+### Full Rollback
+
+1. Restore `mcp.json` from Git history:
+   ```bash
+   git checkout HEAD~1 -- mcp.json
+   ```
+
+2. Verify configuration:
+   ```bash
+   .\scripts\verify-config.ps1
+   ```
+
+3. Test MCP servers in Cursor
+
+### Troubleshooting Rollback
+
+- **Docker images still present:** Safe to keep, won't interfere
+- **Volume mounts:** Docker volumes (`shrimp_data`) persist independently
+- **Environment variables:** No changes needed, same variables work for both approaches
+
 ## Migration Status
 
-- ✅ **migrated to Docker:** memory, playwright, duckduckgo, grafana
-- ⏳ **pending migration:** github (no official Docker image), shrimp-task-manager (local build)
+- ✅ **migrated to Docker:** memory, playwright, duckduckgo, grafana, github, shrimp-task-manager
+- ✅ **All servers:** Now using Docker for cross-platform consistency
 
 ## References
 

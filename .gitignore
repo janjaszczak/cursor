@@ -57,3 +57,6 @@ plans/
 
 # Plans directory (optional - uncomment to ignore)
 # plans/
+
+# Test results (generated artifacts)
+test-results/
