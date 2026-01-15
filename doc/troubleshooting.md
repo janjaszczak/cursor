@@ -67,7 +67,7 @@ sudo ./scripts/setup-env-vars.sh
 ```
 This sets all MCP environment variables in WSL (where MCPs actually run).
 
-**Note:** All MCP servers run in WSL, so MCP environment variables (NEO4J_*, GITHUB_*, GRAFANA_*) should be set only in WSL, not in Windows.
+**Note:** All MCP servers run in Docker containers, and Docker runs in WSL. Therefore, MCP environment variables (NEO4J_*, GITHUB_*, GRAFANA_*) should be set only in WSL, not in Windows.
 
 **Step 4: Restart Cursor**
 
@@ -117,9 +117,10 @@ This sets all MCP environment variables in WSL (where MCPs actually run).
 
 ### MCPs not working?
 
-1. Check environment variables are set (run verify script)
-2. Verify WSL is accessible: `wsl.exe -- echo "WSL_OK"`
-3. Check MCP server paths in user `mcp.json` are correct
+1. Check Docker is running: `docker --version`
+2. Check environment variables are set (run verify script)
+3. Verify Docker images exist: `docker images | grep mcp`
+4. Run test script: `.\scripts\test-mcp-servers.ps1`
 
 ### WSL shows no MCPs?
 
