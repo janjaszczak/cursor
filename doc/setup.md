@@ -7,7 +7,7 @@ This document describes the current state of the Cursor configuration setup.
 **Single source of truth:** `C:\Users\janja\OneDrive\Dokumenty\GitHub\cursor\.cursor\`
 
 This directory contains:
-- `rules/` - Project rules (8 files)
+- `rules/` - Project rules (6 files)
 - `mcp.json` - MCP server configurations
 - `cli-config.json` - CLI permissions
 - `commands/` - Custom commands (2 files)
@@ -45,16 +45,16 @@ All MCPs execute via WSL (`wsl.exe` wrapper) for consistency.
 
 ## Rules
 
-8 project rules are defined:
+6 project rules are defined (context-specific):
 
-1. `quality.mdc` - Global engineering policies (always applied)
-2. `mcp-tools.mdc` - MCP usage guidelines (always applied)
-3. `next-stack.mdc` - Next.js stack conventions (`frontend/**`)
-4. `python-backend.mdc` - FastAPI conventions (`backend/**`)
-5. `python-style.mdc` - Python style guide (`**/*.py`)
-6. `vanilla-web.mdc` - Vanilla web conventions (`**/*.{html,css,js}`)
-7. `parsers.mdc` - Data parsing rules (`data/**`)
-8. `solid.mdc` - SOLID principles (`**/*.{ts,tsx,js,jsx,py,env,yml,md}`)
+1. `next-stack.mdc` - Next.js stack conventions (`frontend/**`)
+2. `python-backend.mdc` - FastAPI conventions (`backend/**`)
+3. `python-style.mdc` - Python style guide (`**/*.py`)
+4. `vanilla-web.mdc` - Vanilla web conventions (`**/*.{html,css,js}`)
+5. `parsers.mdc` - Data parsing rules (`data/**`)
+6. `solid.mdc` - SOLID principles (`**/*.{ts,tsx,js,jsx,py,env,yml,md}`)
+
+**Note:** Global engineering policies (quality, MCP tools usage) are now integrated into `cursor-user_roles.txt` at the repository root. This provides a single source of truth for workflow, quality requirements, and MCP tool usage guidelines.
 
 ## Commands
 

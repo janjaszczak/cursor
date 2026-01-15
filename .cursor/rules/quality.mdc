@@ -1,9 +1,0 @@
----
-description: Global engineering policies (coverage, lint/format, Git hygiene)
-globs: []          # optional when alwaysApply=true
-alwaysApply: true
----
-Enforce CI coverage: lines ≥ 80%, branches ≥ 70%, per-file guardrail lines ≥ 70%.
-Run linters/formatters in CI before tests; block merges on errors.
-Use Conventional Commits; keep PRs small with test steps and risks.
-Never commit secrets; provide .env.example and local setup notes.

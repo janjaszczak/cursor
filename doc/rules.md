@@ -8,33 +8,16 @@ Rules are workspace-level guidelines that Cursor applies when working on this pr
 
 ## Rule Types
 
-### Always Applied Rules
+### Global Rules (Integrated)
 
-These rules apply to all files in the workspace:
+Global engineering policies, MCP tools usage guidelines, and workflow instructions are now integrated into **`cursor-user_roles.txt`** at the repository root. This includes:
 
-#### `quality.mdc`
-**Description:** Global engineering policies (coverage, lint/format, Git hygiene)
+- **Quality requirements:** Coverage (lines ≥ 80%, branches ≥ 70%), CI/CD policies, Git hygiene
+- **MCP tools usage:** All 6 MCP servers (memory, duckduckgo, github, playwright, grafana, shrimp-task-manager) with usage guidelines
+- **Workflow:** 7-step ALWAYS-ON WORKFLOW with MCP integration at each step
+- **Guardrails:** Security, destructive operations, rollback procedures
 
-**Key policies:**
-- CI coverage: lines ≥ 80%, branches ≥ 70%, per-file guardrail lines ≥ 70%
-- Run linters/formatters in CI before tests; block merges on errors
-- Use Conventional Commits; keep PRs small with test steps and risks
-- Never commit secrets; provide `.env.example` and local setup notes
-
-#### `mcp-tools.mdc`
-**Description:** How to use available MCP servers and tools
-
-**Key policies:**
-- Prefer using MCP tools instead of "simulating" their behavior
-- Before using tools that change external state, explain and ask for confirmation
-- Never expose or log secrets returned by MCP tools
-
-**MCP servers:**
-- `memory` - Long-term project memory (Neo4j)
-- `duckduckgo` - External web search
-- `github` - GitHub repository operations
-- `playwright` - Browser automation
-- `grafana` - Metrics and dashboards
+See `cursor-user_roles.txt` for the complete integrated ruleset.
 
 ### Context-Specific Rules
 
@@ -131,9 +114,10 @@ These rules apply only to files matching specific glob patterns:
 
 ## Rule Priority
 
-1. Always-applied rules (lowest priority)
-2. Context-specific rules (higher priority, based on file path)
-3. User-level rules (highest priority, from `cursor-user_roles.txt`)
+1. Context-specific rules (`.cursor/rules/*.mdc` with globs)
+2. Global rules (`cursor-user_roles.txt` at repository root - highest priority)
+
+**Note:** `cursor-user_roles.txt` serves as the primary source for global engineering policies, MCP tools usage, and workflow instructions. Context-specific rules in `.cursor/rules/` complement these global rules for specific file patterns.
 
 ## Best Practices
 
