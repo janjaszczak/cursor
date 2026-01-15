@@ -25,7 +25,7 @@ if ($cursorConfigDir) {
 
 # Check repo .cursor directory
 Write-Host "`nChecking repo .cursor directory..." -ForegroundColor Yellow
-$repoCursorPath = "C:\Users\janja\OneDrive\Dokumenty\GitHub\ai\.cursor"
+$repoCursorPath = "C:\Users\janja\OneDrive\Dokumenty\GitHub\cursor\.cursor"
 if (Test-Path $repoCursorPath) {
     Write-Host "  ✓ Repo .cursor directory exists" -ForegroundColor Green
     

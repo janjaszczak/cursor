@@ -16,11 +16,11 @@ if (-not $isAdmin) {
 Write-Host "=== Fixing MCP Configuration Duplicates ===" -ForegroundColor Cyan
 Write-Host ""
 
-$repoConfigPath = "C:\Users\janja\OneDrive\Dokumenty\GitHub\ai\.cursor\mcp.json"
+$repoConfigPath = "C:\Users\janja\OneDrive\Dokumenty\GitHub\cursor\.cursor\mcp.json"
 $globalConfigPath = "$env:USERPROFILE\.cursor\mcp.json"
 
 # Ensure CURSOR_CONFIG_DIR is set
-$cursorConfigDir = "C:\Users\janja\OneDrive\Dokumenty\GitHub\ai\.cursor"
+$cursorConfigDir = "C:\Users\janja\OneDrive\Dokumenty\GitHub\cursor\.cursor"
 [Environment]::SetEnvironmentVariable("CURSOR_CONFIG_DIR", $cursorConfigDir, "User")
 Write-Host "✓ CURSOR_CONFIG_DIR set to: $cursorConfigDir" -ForegroundColor Green
 

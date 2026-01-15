@@ -44,7 +44,7 @@ source "$ENV_FILE"
 # For user, we'll use export statements in ~/.profile
 
 # CURSOR_CONFIG_DIR
-export CURSOR_CONFIG_DIR="/mnt/c/Users/janja/OneDrive/Dokumenty/GitHub/ai/.cursor"
+export CURSOR_CONFIG_DIR="/mnt/c/Users/janja/OneDrive/Dokumenty/GitHub/cursor/.cursor"
 echo "✓ CURSOR_CONFIG_DIR set to: $CURSOR_CONFIG_DIR"
 
 # MCP Environment Variables are loaded from env.local above

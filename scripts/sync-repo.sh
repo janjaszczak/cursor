@@ -4,7 +4,7 @@
 
 set -e
 
-REPO_PATH="/mnt/c/Users/janja/OneDrive/Dokumenty/GitHub/ai"
+REPO_PATH="/mnt/c/Users/janja/OneDrive/Dokumenty/GitHub/cursor"
 FORCE=false
 
 while [[ $# -gt 0 ]]; do
@@ -47,7 +47,7 @@ if [ -n "$REMOTE_COMMIT" ] && [ "$LOCAL_COMMIT" != "$REMOTE_COMMIT" ]; then
 
     # Push any local commits if we have them
     AHEAD=$(git rev-list --count "origin/$CURRENT_BRANCH..HEAD" 2>/dev/null || echo "0")
-    if [ "$AHEAD" -gt 0 ]; then
+if [ "$AHEAD" -gt 0 ]; then
         echo "Pushing local commits..."
         git push origin "$CURRENT_BRANCH"
     fi

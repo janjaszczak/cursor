@@ -7,11 +7,11 @@ set -e
 echo "=== Fixing MCP Configuration Duplicates ==="
 echo ""
 
-REPO_CONFIG_PATH="/mnt/c/Users/janja/OneDrive/Dokumenty/GitHub/ai/.cursor/mcp.json"
+REPO_CONFIG_PATH="/mnt/c/Users/janja/OneDrive/Dokumenty/GitHub/cursor/.cursor/mcp.json"
 GLOBAL_CONFIG_PATH="$HOME/.cursor/mcp.json"
 
 # Ensure CURSOR_CONFIG_DIR is set in ~/.profile
-CURSOR_CONFIG_DIR="/mnt/c/Users/janja/OneDrive/Dokumenty/GitHub/ai/.cursor"
+CURSOR_CONFIG_DIR="/mnt/c/Users/janja/OneDrive/Dokumenty/GitHub/cursor/.cursor"
 
 if ! grep -q "CURSOR_CONFIG_DIR" ~/.profile 2>/dev/null; then
     echo "export CURSOR_CONFIG_DIR=\"$CURSOR_CONFIG_DIR\"" >> ~/.profile

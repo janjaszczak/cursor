@@ -28,7 +28,7 @@ fi
 # Check repo .cursor directory
 echo ""
 echo "Checking repo .cursor directory..."
-REPO_CURSOR_PATH="/mnt/c/Users/janja/OneDrive/Dokumenty/GitHub/ai/.cursor"
+REPO_CURSOR_PATH="/mnt/c/Users/janja/OneDrive/Dokumenty/GitHub/cursor/.cursor"
 if [ -d "$REPO_CURSOR_PATH" ]; then
     echo "  ✓ Repo .cursor directory exists"
     
@@ -96,7 +96,7 @@ fi
 # Check sync scripts
 echo ""
 echo "Checking sync scripts..."
-REPO_ROOT="/mnt/c/Users/janja/OneDrive/Dokumenty/GitHub/ai"
+REPO_ROOT="/mnt/c/Users/janja/OneDrive/Dokumenty/GitHub/cursor"
 for script in "$REPO_ROOT/scripts/sync-repo.ps1" "$REPO_ROOT/scripts/sync-repo.sh"; do
     if [ -f "$script" ]; then
         echo "  ✓ $(basename $script) exists"

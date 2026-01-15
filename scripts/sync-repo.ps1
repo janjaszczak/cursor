@@ -6,7 +6,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-$repoPath = "C:\Users\janja\OneDrive\Dokumenty\GitHub\ai"
+$repoPath = "C:\Users\janja\OneDrive\Dokumenty\GitHub\cursor"
 
 Push-Location $repoPath
 
