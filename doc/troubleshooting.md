@@ -110,9 +110,10 @@ This sets all MCP environment variables in WSL (where MCPs actually run).
 
 ### MCP servers not starting
 
-1. Verify environment variables are set (check with `echo $VAR_NAME` in WSL)
-2. Check that WSL is accessible from Windows: `wsl.exe -- echo "WSL_OK"`
-3. Verify MCP server dependencies are installed in WSL (Node.js, npm, etc.)
+1. Verify Docker is running: `docker --version`
+2. Verify environment variables are set (check with `echo $VAR_NAME` in WSL)
+3. Check Docker images exist: `docker images | grep mcp`
+4. Run test script: `.\scripts\test-mcp-servers.ps1`
 
 ### MCPs not working?
 

@@ -1,10 +1,10 @@
 # MCP Docker Configuration Guide
 
-This document describes how to use Docker-based MCP servers and manage Docker images.
+This document describes Docker-specific operations for MCP servers: building images, managing containers, and troubleshooting.
 
 ## Overview
 
-Most MCP servers run in Docker containers for consistency, isolation, and ease of management. Images are available from the [Docker Hub MCP Catalog](https://hub.docker.com/mcp).
+All MCP servers run in Docker containers. Most images are available from the [Docker Hub MCP Catalog](https://hub.docker.com/mcp). Custom Dockerfiles are available for servers without official images.
 
 ## Available Docker Images
 
@@ -14,45 +14,15 @@ Most MCP servers run in Docker containers for consistency, isolation, and ease o
 - **mcp/playwright** - Playwright browser automation
 - **mcp/duckduckgo** - DuckDuckGo web search
 - **mcp/memory** - Neo4j Memory MCP server
+- **mcp/github** - GitHub MCP server
 
 ### Custom Images
 
-Custom Dockerfiles are available for servers without official images:
-- `docker/mcp-memory/` - Neo4j Memory MCP Server
-- `docker/mcp-duckduckgo/` - DuckDuckGo MCP Server
-
-## Configuration
-
-### Basic Docker Configuration
-
-All Docker-based MCP servers use this pattern in `mcp.json`:
-
-```json
-{
-  "command": "docker",
-  "args": [
-    "run",
-    "-i",
-    "--rm",
-    "-e", "ENV_VAR_NAME",
-    "mcp/server-name",
-    "--transport=stdio"
-  ]
-}
-```
-
-### Environment Variables
-
-**CRITICAL:** All secrets must be passed via environment variables (`-e VAR_NAME`), never hardcoded in `mcp.json`.
-
-Set environment variables in WSL (where Docker runs):
-```bash
-export NEO4J_URI="neo4j://localhost:7687"
-export NEO4J_USERNAME="neo4j"
-export NEO4J_PASSWORD="your_password"
-export GRAFANA_URL="http://localhost:3001"
-export GRAFANA_API_KEY="your_key"
-```
+Custom Dockerfiles are available in `docker/mcp-*/`:
+- `docker/mcp-memory/` - Neo4j Memory MCP Server (if not available on Docker Hub)
+- `docker/mcp-duckduckgo/` - DuckDuckGo MCP Server (if not available on Docker Hub)
+- `docker/mcp-github/` - GitHub MCP Server
+- `docker/mcp-shrimp/` - Shrimp Task Manager (clones and builds from GitHub)
 
 ## Managing Docker Images
 
@@ -66,10 +36,7 @@ export GRAFANA_API_KEY="your_key"
 ./scripts/check-docker-images.sh
 ```
 
-This script:
-- Checks if images exist locally
-- Verifies availability on Docker Hub
-- Reports which images need to be built
+This script checks if images exist locally, verifies availability on Docker Hub, and reports which images need to be built.
 
 ### Pull Latest Images
 
@@ -78,6 +45,7 @@ docker pull mcp/grafana
 docker pull mcp/playwright
 docker pull mcp/duckduckgo
 docker pull mcp/memory
+docker pull mcp/github
 ```
 
 ### Build Custom Images
@@ -96,7 +64,31 @@ Or build individual images:
 ```bash
 .\scripts\build-mcp-images.ps1 --memory
 .\scripts\build-mcp-images.ps1 --duckduckgo
+.\scripts\build-mcp-images.ps1 --github
+.\scripts\build-mcp-images.ps1 --shrimp
 ```
+
+## Docker Volumes
+
+### Shrimp Task Manager Data
+
+Shrimp uses a Docker named volume for data persistence:
+
+```bash
+# Create volume (one-time setup)
+docker volume create shrimp_data
+
+# Backup data
+docker run --rm -v shrimp_data:/data -v $(pwd):/backup alpine tar czf /backup/shrimp_backup.tar.gz -C /data .
+
+# Restore data
+docker run --rm -v shrimp_data:/data -v $(pwd):/backup alpine tar xzf /backup/shrimp_backup.tar.gz -C /data
+```
+
+**Advantages:**
+- Works identically in Windows and WSL
+- Data persists independently of host filesystem
+- No path synchronization issues
 
 ## Testing
 
@@ -117,7 +109,7 @@ Tests verify:
 - Environment variable configuration
 - Server health
 
-Results are saved to `test-results/mcp-test-YYYYMMDD-HHMMSS.json`.
+Results are saved to `test-results/mcp-test-YYYYMMDD-HHMMSS.json` and HTML reports.
 
 ## Troubleshooting
 
@@ -140,13 +132,12 @@ If an image is not found:
 2. Verify Docker is accessible: `docker --version`
 3. Check WSL integration in Docker Desktop settings
 
-## Security Best Practices
+### Volume Mount Issues
 
-1. **Never hardcode secrets** in `mcp.json`
-2. **Use environment variables** for all sensitive data
-3. **Set variables in WSL** where Docker runs
-4. **Rotate secrets regularly**
-5. **Use `.env.local`** for local development (not committed to Git)
+If using volume mounts (not recommended for cross-platform):
+- **Windows:** Use `\\wsl.localhost\Ubuntu\...` paths
+- **WSL:** Use `/home/...` paths
+- **Better:** Use Docker named volumes (see Shrimp example above)
 
 ## Rollback Plan
 
@@ -194,13 +185,17 @@ If you need to revert to the previous configuration (WSL-based execution):
 - **Volume mounts:** Docker volumes (`shrimp_data`) persist independently
 - **Environment variables:** No changes needed, same variables work for both approaches
 
-## Migration Status
+## Security Best Practices
 
-- ✅ **migrated to Docker:** memory, playwright, duckduckgo, grafana, github, shrimp-task-manager
-- ✅ **All servers:** Now using Docker for cross-platform consistency
+1. **Never hardcode secrets** in `mcp.json`
+2. **Use environment variables** for all sensitive data (`-e VAR_NAME`)
+3. **Set variables in WSL** where Docker runs
+4. **Rotate secrets regularly**
+5. **Use `.env.local`** for local development (not committed to Git)
 
 ## References
 
 - [Docker Hub MCP Catalog](https://hub.docker.com/mcp)
 - [MCP Documentation](https://modelcontextprotocol.io)
 - [Docker Documentation](https://docs.docker.com)
+- [Main MCP Guide](mcp.md) - Server details and usage

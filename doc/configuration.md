@@ -41,7 +41,7 @@ After setting, restart Cursor for changes to take effect.
 
 ### MCP Environment Variables
 
-**IMPORTANT:** All MCP servers run in WSL (via `wsl.exe`), so MCP environment variables should be set **only in WSL**, not in Windows.
+**IMPORTANT:** All MCP servers run in Docker containers, and Docker runs in WSL. Therefore, MCP environment variables should be set **only in WSL**, not in Windows.
 
 **Required variables (WSL only):**
 - `NEO4J_URI` - Neo4j connection URI (e.g., `neo4j://localhost:7687`)
@@ -108,21 +108,21 @@ The script will:
 
 ## Shrimp Task Manager
 
-Shrimp Task Manager is installed locally in WSL at `~/mcp-shrimp-task-manager/`. Data is stored in `~/.shrimp_data/` (not synced via Git).
+Shrimp Task Manager runs in a Docker container (`mcp/shrimp`). The Dockerfile clones and builds from the official GitHub repository. Data is stored in a Docker named volume (`shrimp_data`).
 
 **Configuration:**
-- Entry point: `~/mcp-shrimp-task-manager/dist/index.js`
-- Configured in `.cursor/mcp.json` to run via WSL
-- Environment variables: `DATA_DIR`, `TEMPLATES_USE`, `ENABLE_GUI`
+- Docker image: `mcp/shrimp` (built from `docker/mcp-shrimp/Dockerfile`)
+- Data volume: `shrimp_data` (Docker named volume)
+- Environment variables: `DATA_DIR`, `TEMPLATES_USE`, `ENABLE_GUI`, plus `MCP_PROMPT_*` variables
 
 **To update Shrimp:**
 ```bash
-cd ~/mcp-shrimp-task-manager
-git pull
-npm install
-npm run build
+# Rebuild the Docker image
+.\scripts\build-mcp-images.ps1 --shrimp
 # Restart Cursor to apply changes
 ```
+
+See [mcp-docker.md](mcp-docker.md) for Docker volume management and backup procedures.
 
 ## Scripts
 

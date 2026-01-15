@@ -43,7 +43,7 @@ All documentation is in the **[doc/](doc/)** directory:
 
 - **Single source of truth**: All Cursor config in `.cursor/` directory
 - **Cross-platform**: Works on Windows and WSL with same configuration
-- **MCP servers**: All MCPs run in WSL for consistency
+- **MCP servers**: All MCPs run in Docker containers for cross-platform consistency
 - **Git sync**: Scripts to synchronize configuration across machines
 - **Secure**: Secrets in environment variables, not in config files
 
@@ -67,8 +67,7 @@ The `mcp.json` file is configured to work seamlessly in both Windows and WSL env
 - **Easy updates** - Pull latest images with `docker pull`
 - **Security** - All secrets via environment variables, never hardcoded
 
-**Docker-based servers:** memory, playwright, duckduckgo, grafana
-**WSL-based servers:** github, shrimp-task-manager (not yet migrated)
+**All servers use Docker:** memory, playwright, duckduckgo, grafana, github, shrimp-task-manager
 
 ### Testing MCP Servers
 
@@ -82,7 +81,7 @@ This verifies:
 - Environment variable configuration
 - Server health checks
 
-See [doc/mcp.md](doc/mcp.md) for more details on the execution model and Docker setup.
+See [doc/mcp.md](doc/mcp.md) for server details and usage, and [doc/mcp-docker.md](doc/mcp-docker.md) for Docker-specific operations.
 
 ## Understanding Duplicates
 

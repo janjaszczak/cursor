@@ -34,16 +34,16 @@ This directory contains:
 
 ## MCP Servers
 
-All 6 MCP servers are configured and running:
+All 6 MCP servers are configured and running in Docker containers:
 
-1. **memory** - Neo4j memory server (`@sylweriusz/mcp-neo4j-memory-server`)
-2. **playwright** - Browser automation (`@playwright/mcp@latest`)
-3. **duckduckgo** - Web search (`duckduckgo-mcp-server` via uvx)
-4. **github** - GitHub operations (`github-mcp-custom@1.0.20` - pinned)
-5. **grafana** - Metrics/dashboards (`mcp/grafana` Docker image)
-6. **shrimp-task-manager** - Task planning (local build at `~/mcp-shrimp-task-manager/`)
+1. **memory** - Neo4j memory server (`mcp/memory`)
+2. **playwright** - Browser automation (`mcp/playwright`)
+3. **duckduckgo** - Web search (`mcp/duckduckgo`)
+4. **github** - GitHub operations (`mcp/github`)
+5. **grafana** - Metrics/dashboards (`mcp/grafana`)
+6. **shrimp-task-manager** - Task planning (`mcp/shrimp`, built from GitHub)
 
-All MCPs execute via WSL (`wsl.exe` wrapper) for consistency.
+All MCPs execute via Docker for cross-platform consistency (Windows and WSL).
 
 ## Rules
 
