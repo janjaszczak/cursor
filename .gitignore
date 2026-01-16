@@ -54,6 +54,7 @@ extensions/
 projects/
 browser-logs/
 plans/
+worktrees/
 
 # Plans directory (optional - uncomment to ignore)
 # plans/
