@@ -1,5 +1,3 @@
-# cleanup
-
 # /cleanup — Post-work Project Hygiene (audit → propose → apply)
 
 You are in CLEANUP mode. Goal: restore repo order after agent work.

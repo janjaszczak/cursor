@@ -43,8 +43,6 @@ tmp/
 
 # Environment variables
 .env
-.env.local
-env.local
 
 # Cursor IDE files (not tracked)
 ai-tracking/

@@ -14,8 +14,9 @@ $mcpServers = @(
     @{ Name = "github"; Image = "mcp/github"; AltImage = ""; Required = $true },
     @{ Name = "playwright"; Image = "mcp/playwright"; AltImage = ""; Required = $true },
     @{ Name = "duckduckgo"; Image = "mcp/duckduckgo"; AltImage = ""; Required = $true },
-    @{ Name = "memory"; Image = "mcp/memory"; AltImage = ""; Required = $true },
-    @{ Name = "shrimp"; Image = "mcp/shrimp"; AltImage = ""; Required = $true }
+    @{ Name = "memory"; Image = "mcp/neo4j-memory"; AltImage = ""; Required = $true },
+    @{ Name = "shrimp"; Image = "mcp/shrimp"; AltImage = ""; Required = $true },
+    @{ Name = "postman"; Image = "mcp/postman"; AltImage = ""; Required = $true }
 )
 
 $results = @()

@@ -78,7 +78,7 @@ foreach ($serverName in $servers) {
         }
         
         # Check if image exists or can be pulled
-        # Image name is the last arg before --transport=stdio that's not a Docker flag
+        # Image name is the argument containing "/" that's not a Docker flag or env var value
         $imageName = $null
         $skipNext = $false
         for ($i = 0; $i -lt $server.args.Count; $i++) {
@@ -87,9 +87,11 @@ foreach ($serverName in $servers) {
                 $skipNext = $false
                 continue
             }
-            if ($arg -match "^(run|-i|--rm|--transport=stdio)$") {
+            # Skip Docker flags
+            if ($arg -match "^(run|-i|--rm|--transport=stdio|--full|--code|--region)$") {
                 continue
             }
+            # Skip env var and volume flags (skip next arg)
             if ($arg -eq "-e" -or $arg -eq "-v") {
                 $skipNext = $true
                 continue
@@ -98,18 +100,14 @@ foreach ($serverName in $servers) {
             if ($arg -match ":") {
                 continue
             }
-            # This could be the image name - we'll take the last one before --transport
-            if ($i + 1 -lt $server.args.Count -and $server.args[$i + 1] -eq "--transport=stdio") {
-                $imageName = $arg
-                break
+            # Skip region values (us/eu) and other single-word values
+            if ($arg -match "^(us|eu)$" -and $i -gt 0 -and $server.args[$i - 1] -eq "--region") {
+                continue
             }
-            # Or if it's the last arg before --transport
-            if ($i + 1 -lt $server.args.Count) {
-                $nextArg = $server.args[$i + 1]
-                if ($nextArg -eq "--transport=stdio") {
-                    $imageName = $arg
-                    break
-                }
+            # Image name contains "/" and is not a flag
+            if ($arg -match "/" -and $arg -notmatch "^-") {
+                $imageName = $arg
+                # Continue to check if there's a better match, but this is likely it
             }
         }
         if ($imageName) {

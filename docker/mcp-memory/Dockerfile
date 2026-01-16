@@ -1,7 +1,7 @@
 # Dockerfile for Neo4j Memory MCP Server
 # This image wraps @sylweriusz/mcp-neo4j-memory-server for Docker execution
 
-FROM node:20-alpine
+FROM node:22-alpine
 
 # Install the MCP server globally
 RUN npm install -g @sylweriusz/mcp-neo4j-memory-server

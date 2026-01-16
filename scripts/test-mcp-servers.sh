@@ -98,8 +98,9 @@ PYEOF
             errors+=("$server_name: Docker not available")
         fi
         
-        # Check image
-        image_name=$(echo "$server_config" | grep "^arg:" | grep -vE "^(run|-i|--rm|-e|--transport=stdio)$" | head -1 | cut -d: -f2-)
+        # Check image - find the image name (typically contains /) before --transport=stdio
+        # Skip Docker flags, env vars, volumes, and MCP flags like --full, --code, --region
+        image_name=$(echo "$server_config" | grep "^arg:" | grep -vE "^(run|-i|--rm|-e|-v|--transport=stdio|--full|--code|--region)$" | grep -vE "^(us|eu)$" | grep "/" | head -1 | cut -d: -f2-)
         if [ -n "$image_name" ]; then
             if docker images "$image_name" --format "{{.Repository}}:{{.Tag}}" 2>/dev/null | grep -q .; then
                 echo "  ✓ Image exists locally: $image_name"

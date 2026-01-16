@@ -16,8 +16,9 @@ declare -a servers=(
     "github:mcp/github:"
     "playwright:mcp/playwright:"
     "duckduckgo:mcp/duckduckgo:"
-    "memory:mcp/memory:"
+    "memory:mcp/neo4j-memory:"
     "shrimp:mcp/shrimp:"
+    "postman:mcp/postman:"
 )
 
 available_images=()

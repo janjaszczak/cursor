@@ -6,12 +6,17 @@
         "run",
         "-i",
         "--rm",
-        "-e", "NEO4J_URI",
-        "-e", "NEO4J_USERNAME",
-        "-e", "NEO4J_PASSWORD",
-        "-e", "NEO4J_DATABASE",
-        "mcp/memory",
-        "--transport=stdio"
+        "--network",
+        "mcp-network",
+        "-e",
+        "NEO4J_URI",
+        "-e",
+        "NEO4J_USERNAME",
+        "-e",
+        "NEO4J_PASSWORD",
+        "-e",
+        "NEO4J_DATABASE",
+        "mcp/neo4j-memory"
       ]
     },
     "playwright": {
@@ -23,22 +28,14 @@
         "mcp/playwright"
       ]
     },
-    "duckduckgo": {
-      "command": "docker",
-      "args": [
-        "run",
-        "-i",
-        "--rm",
-        "mcp/duckduckgo"
-      ]
-    },
     "github": {
       "command": "docker",
       "args": [
         "run",
         "-i",
         "--rm",
-        "-e", "GITHUB_PERSONAL_ACCESS_TOKEN",
+        "-e",
+        "GITHUB_PERSONAL_ACCESS_TOKEN",
         "mcp/github",
         "--transport=stdio"
       ]
@@ -49,8 +46,10 @@
         "run",
         "-i",
         "--rm",
-        "-e", "GRAFANA_URL",
-        "-e", "GRAFANA_API_KEY",
+        "-e",
+        "GRAFANA_URL",
+        "-e",
+        "GRAFANA_API_KEY",
         "mcp/grafana",
         "--transport=stdio"
       ]
@@ -61,24 +60,56 @@
         "run",
         "-i",
         "--rm",
-        "-v", "shrimp_data:/app/data",
-        "-e", "DATA_DIR=/app/data",
-        "-e", "TEMPLATES_USE=en",
-        "-e", "ENABLE_GUI=false",
-        "-e", "MCP_PROMPT_PROCESS_THOUGHT_APPEND=\n\n# Workspace Operating Rules (MCP-first correctness)\n- Always start by checking: (1) shrimp tasks (listTasks/queryTask) for duplicates, (2) neo4j memory for similar solutions/constraints, (3) repo evidence (read relevant files). If any is unavailable, mark UNCERTAIN and give the shortest verification path.\n- Use MCP tools deliberately: duckduckgo for niche/up-to-date facts; github-mcp-custom for repo search/PR context; playwright for E2E; grafana for metrics/logs; neo4j-memory-server for lessons learned/how-to.\n- Never claim something exists/works/is configured without citing exact file paths and (when critical) small snippets.\n- Destructive ops (migrations/deletes/mass refactors/force push/infra/major deps): show rollback + exact commands, then stop for explicit user confirmation.\n- Output: concise, decision-oriented; include 1 key risk/failure mode and 1 invalidating assumption when relevant.\n",
-        "-e", "MCP_PROMPT_INIT_PROJECT_RULES_APPEND=\n\n# Project Rules (agent-usable)\nCreate rules optimized for agents (short, testable, repo-grounded). Prefer: coding standards, repo conventions, commands to verify, definition-of-done, and where-to-find-what. Avoid long prose; include paths and canonical docs locations.\nAlso propose 3–7 candidate \"memories\" (how-to/lessons/where-to-find) and ask the user to approve saving to neo4j memory.\n",
-        "-e", "MCP_PROMPT_PLAN_TASK_APPEND=\n\n# Planning Requirements\nBefore planning: (1) listTasks/queryTask to avoid duplicates; (2) check neo4j memory for prior patterns/constraints; (3) read repo entrypoints relevant to the task.\nPlan must include: scope + non-goals; files to touch; step-by-step checkpoints; acceptance criteria; explicit verification commands; risks + rollback; and dependencies. Produce tasks small enough to execute and verify deterministically.\nIf research is needed, call it out explicitly and use duckduckgo MCP; do not guess.\n",
-        "-e", "MCP_PROMPT_ANALYZE_TASK_APPEND=\n\n# Analysis Requirements\nProvide 2–3 viable approaches with trade-offs (correctness, maintainability, security, complexity). Identify unknowns and propose the fastest validation (tiny repro, grep, minimal test, targeted doc/source).\nSecurity-by-design: note authn/authz, input validation, secrets handling, and logging.\nWhen facts may be time-sensitive or niche, verify via duckduckgo MCP and cite what changed.\n",
-        "-e", "MCP_PROMPT_SPLIT_TASKS_APPEND=\n\n# Task Decomposition Rules\nSplit into atomic tasks with: objective, exact outputs (files/changes), preconditions, and verification commands. Keep each task executable end-to-end without hidden dependencies.\nEnsure ordering/dep graph is explicit. Prefer fewer, clearer tasks over many micro-tasks.\n",
-        "-e", "MCP_PROMPT_EXECUTE_TASK_APPEND=\n\n# Execution Rules\nExecute exactly one task at a time unless the user explicitly requests continuous execution.\nBefore edits: read relevant files; do not invent APIs. During execution: implement + verify locally (or provide exact commands) + update canonical docs + remove temp artifacts.\nIf UI/E2E relevant, use playwright. If runtime/ops signals matter, use grafana to validate metrics/logs.\nIf blocked (secrets/access/CI), stop at the smallest blocker and propose the fastest unblock path.\n",
-        "-e", "MCP_PROMPT_VERIFY_TASK_APPEND=\n\n# Verification Bar\nVerification must be explicit: commands (lint/typecheck/tests/build) and expected signals. If you cannot run them, provide exact commands and what \"good\" looks like.\nIf deployment is required to validate, state the minimum pipeline evidence required and the environment-dependent checks.\n",
-        "-e", "MCP_PROMPT_REFLECT_TASK_APPEND=\n\n# Reflection + Knowledge Capture\nAssess: what worked, what failed, and one improvement to prevent regressions.\nPropose 3–7 memory candidates (how-to, lessons learned, where-to-find) and ask the user whether to save them to neo4j memory. Only save if user approves.\n",
-        "-e", "MCP_PROMPT_LIST_TASKS_APPEND=\n\nWhen listing tasks, present IDs, titles, status, next action, and the recommended task to execute next (with 1-sentence rationale).",
-        "-e", "MCP_PROMPT_QUERY_TASK_APPEND=\n\nWhen querying tasks, prefer exact matches first; show task IDs and why they match the query.",
-        "-e", "MCP_PROMPT_GET_TASK_DETAIL_APPEND=\n\nWhen showing a task, include: goal, current status, dependencies, latest changes, and the next verification step.",
+        "-v",
+        "shrimp_data:/app/data",
+        "-e",
+        "DATA_DIR=/app/data",
+        "-e",
+        "TEMPLATES_USE=en",
+        "-e",
+        "ENABLE_GUI=false",
+        "-e",
+        "MCP_PROMPT_PROCESS_THOUGHT_APPEND=\n\n# Workspace Operating Rules (MCP-first correctness)\n- Always start by checking: (1) shrimp tasks (listTasks/queryTask) for duplicates, (2) neo4j memory for similar solutions/constraints, (3) repo evidence (read relevant files). If any is unavailable, mark UNCERTAIN and give the shortest verification path.\n- Use MCP tools deliberately: duckduckgo for niche/up-to-date facts; github-mcp-custom for repo search/PR context; playwright for E2E; grafana for metrics/logs; neo4j-memory-server for lessons learned/how-to.\n- Never claim something exists/works/is configured without citing exact file paths and (when critical) small snippets.\n- Destructive ops (migrations/deletes/mass refactors/force push/infra/major deps): show rollback + exact commands, then stop for explicit user confirmation.\n- Output: concise, decision-oriented; include 1 key risk/failure mode and 1 invalidating assumption when relevant.\n",
+        "-e",
+        "MCP_PROMPT_INIT_PROJECT_RULES_APPEND=\n\n# Project Rules (agent-usable)\nCreate rules optimized for agents (short, testable, repo-grounded). Prefer: coding standards, repo conventions, commands to verify, definition-of-done, and where-to-find-what. Avoid long prose; include paths and canonical docs locations.\nAlso propose 3–7 candidate \"memories\" (how-to/lessons/where-to-find) and ask the user to approve saving to neo4j memory.\n",
+        "-e",
+        "MCP_PROMPT_PLAN_TASK_APPEND=\n\n# Planning Requirements\nBefore planning: (1) listTasks/queryTask to avoid duplicates; (2) check neo4j memory for prior patterns/constraints; (3) read repo entrypoints relevant to the task.\nPlan must include: scope + non-goals; files to touch; step-by-step checkpoints; acceptance criteria; explicit verification commands; risks + rollback; and dependencies. Produce tasks small enough to execute and verify deterministically.\nIf research is needed, call it out explicitly and use duckduckgo MCP; do not guess.\n",
+        "-e",
+        "MCP_PROMPT_ANALYZE_TASK_APPEND=\n\n# Analysis Requirements\nProvide 2–3 viable approaches with trade-offs (correctness, maintainability, security, complexity). Identify unknowns and propose the fastest validation (tiny repro, grep, minimal test, targeted doc/source).\nSecurity-by-design: note authn/authz, input validation, secrets handling, and logging.\nWhen facts may be time-sensitive or niche, verify via duckduckgo MCP and cite what changed.\n",
+        "-e",
+        "MCP_PROMPT_SPLIT_TASKS_APPEND=\n\n# Task Decomposition Rules\nSplit into atomic tasks with: objective, exact outputs (files/changes), preconditions, and verification commands. Keep each task executable end-to-end without hidden dependencies.\nEnsure ordering/dep graph is explicit. Prefer fewer, clearer tasks over many micro-tasks.\n",
+        "-e",
+        "MCP_PROMPT_EXECUTE_TASK_APPEND=\n\n# Execution Rules\nExecute exactly one task at a time unless the user explicitly requests continuous execution.\nBefore edits: read relevant files; do not invent APIs. During execution: implement + verify locally (or provide exact commands) + update canonical docs + remove temp artifacts.\nIf UI/E2E relevant, use playwright. If runtime/ops signals matter, use grafana to validate metrics/logs.\nIf blocked (secrets/access/CI), stop at the smallest blocker and propose the fastest unblock path.\n",
+        "-e",
+        "MCP_PROMPT_VERIFY_TASK_APPEND=\n\n# Verification Bar\nVerification must be explicit: commands (lint/typecheck/tests/build) and expected signals. If you cannot run them, provide exact commands and what \"good\" looks like.\nIf deployment is required to validate, state the minimum pipeline evidence required and the environment-dependent checks.\n",
+        "-e",
+        "MCP_PROMPT_REFLECT_TASK_APPEND=\n\n# Reflection + Knowledge Capture\nAssess: what worked, what failed, and one improvement to prevent regressions.\nPropose 3–7 memory candidates (how-to, lessons learned, where-to-find) and ask the user whether to save them to neo4j memory. Only save if user approves.\n",
+        "-e",
+        "MCP_PROMPT_LIST_TASKS_APPEND=\n\nWhen listing tasks, present IDs, titles, status, next action, and the recommended task to execute next (with 1-sentence rationale).",
+        "-e",
+        "MCP_PROMPT_QUERY_TASK_APPEND=\n\nWhen querying tasks, prefer exact matches first; show task IDs and why they match the query.",
+        "-e",
+        "MCP_PROMPT_GET_TASK_DETAIL_APPEND=\n\nWhen showing a task, include: goal, current status, dependencies, latest changes, and the next verification step.",
         "mcp/shrimp",
         "--transport=stdio"
       ]
+    },
+    "postman": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "-e",
+        "POSTMAN_API_KEY",
+        "mcp/postman",
+        "--full",
+        "--transport=stdio"
+      ]
+    },
+    "Apify": {
+      "url": "https://mcp.apify.com",
+      "headers": {}
     }
   }
 }

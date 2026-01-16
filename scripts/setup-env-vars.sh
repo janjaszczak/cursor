@@ -16,12 +16,12 @@ fi
 
 echo "Setting up Cursor environment variables ($SCOPE)..."
 
-# Load environment variables from env.local file
+# Load environment variables from .env file
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-ENV_FILE="$REPO_ROOT/env.local"
+ENV_FILE="$REPO_ROOT/.env"
 if [ ! -f "$ENV_FILE" ]; then
-    echo "⚠ env.local file not found at: $ENV_FILE"
+    echo "⚠ .env file not found at: $ENV_FILE"
     echo "Creating template file..."
     cat > "$ENV_FILE" << 'ENVEOF'
 # Local environment variables for Cursor MCP configuration
@@ -32,12 +32,13 @@ NEO4J_DATABASE=neo4j
 GITHUB_PERSONAL_ACCESS_TOKEN=CHANGE_ME
 GRAFANA_URL=http://localhost:3001
 GRAFANA_API_KEY=CHANGE_ME
+POSTMAN_API_KEY=CHANGE_ME
 ENVEOF
-    echo "✓ Template created. Please edit env.local and run script again."
+    echo "✓ Template created. Please edit .env and run script again."
     exit 0
 fi
 
-echo "Loading variables from env.local..."
+echo "Loading variables from .env..."
 source "$ENV_FILE"
 
 # For system-wide, we'll use /etc/environment format
@@ -47,7 +48,7 @@ source "$ENV_FILE"
 export CURSOR_CONFIG_DIR="$HOME/.cursor"
 echo "✓ CURSOR_CONFIG_DIR set to: $CURSOR_CONFIG_DIR"
 
-# MCP Environment Variables are loaded from env.local above
+# MCP Environment Variables are loaded from .env above
 # Check if any are still CHANGE_ME
 if [ "$NEO4J_PASSWORD" = "CHANGE_ME" ] || [ -z "$NEO4J_PASSWORD" ]; then
     echo "⚠ NEO4J_PASSWORD is not set (CHANGE_ME or empty)"
@@ -58,17 +59,20 @@ fi
 if [ "$GRAFANA_API_KEY" = "CHANGE_ME" ] || [ -z "$GRAFANA_API_KEY" ]; then
     echo "⚠ GRAFANA_API_KEY is not set (CHANGE_ME or empty)"
 fi
+if [ "$POSTMAN_API_KEY" = "CHANGE_ME" ] || [ -z "$POSTMAN_API_KEY" ]; then
+    echo "⚠ POSTMAN_API_KEY is not set (CHANGE_ME or empty)"
+fi
 
 echo ""
-echo "Environment variables loaded from env.local."
-echo "Variables marked with CHANGE_ME need to be set in env.local file."
+echo "Environment variables loaded from .env."
+echo "Variables marked with CHANGE_ME need to be set in .env file."
 
 # Write to appropriate location
 if [ "$EUID" -eq 0 ]; then
     # System-wide: append to /etc/environment (requires sudo)
     {
         echo ""
-        echo "# Cursor/MCP environment variables (from env.local)"
+        echo "# Cursor/MCP environment variables (from .env)"
         echo "CURSOR_CONFIG_DIR=\"$CURSOR_CONFIG_DIR\""
         echo "NEO4J_URI=\"$NEO4J_URI\""
         echo "NEO4J_USERNAME=\"$NEO4J_USERNAME\""
@@ -77,6 +81,7 @@ if [ "$EUID" -eq 0 ]; then
         [ -n "$GITHUB_PERSONAL_ACCESS_TOKEN" ] && [ "$GITHUB_PERSONAL_ACCESS_TOKEN" != "CHANGE_ME" ] && echo "GITHUB_PERSONAL_ACCESS_TOKEN=\"$GITHUB_PERSONAL_ACCESS_TOKEN\""
         echo "GRAFANA_URL=\"$GRAFANA_URL\""
         [ -n "$GRAFANA_API_KEY" ] && [ "$GRAFANA_API_KEY" != "CHANGE_ME" ] && echo "GRAFANA_API_KEY=\"$GRAFANA_API_KEY\""
+        [ -n "$POSTMAN_API_KEY" ] && [ "$POSTMAN_API_KEY" != "CHANGE_ME" ] && echo "POSTMAN_API_KEY=\"$POSTMAN_API_KEY\""
     } >> /etc/environment
     echo "✓ Appended to /etc/environment (system-wide)"
 else
@@ -86,7 +91,7 @@ else
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         {
             echo ""
-            echo "# Cursor/MCP environment variables (from env.local)"
+            echo "# Cursor/MCP environment variables (from .env)"
             echo "export CURSOR_CONFIG_DIR=\"$CURSOR_CONFIG_DIR\""
             echo "export NEO4J_URI=\"$NEO4J_URI\""
             echo "export NEO4J_USERNAME=\"$NEO4J_USERNAME\""
@@ -95,6 +100,7 @@ else
             [ -n "$GITHUB_PERSONAL_ACCESS_TOKEN" ] && [ "$GITHUB_PERSONAL_ACCESS_TOKEN" != "CHANGE_ME" ] && echo "export GITHUB_PERSONAL_ACCESS_TOKEN=\"$GITHUB_PERSONAL_ACCESS_TOKEN\""
             echo "export GRAFANA_URL=\"$GRAFANA_URL\""
             [ -n "$GRAFANA_API_KEY" ] && [ "$GRAFANA_API_KEY" != "CHANGE_ME" ] && echo "export GRAFANA_API_KEY=\"$GRAFANA_API_KEY\""
+            [ -n "$POSTMAN_API_KEY" ] && [ "$POSTMAN_API_KEY" != "CHANGE_ME" ] && echo "export POSTMAN_API_KEY=\"$POSTMAN_API_KEY\""
         } >> ~/.profile
         echo "✓ Appended to ~/.profile"
     fi
