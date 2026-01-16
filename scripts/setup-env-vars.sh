@@ -85,13 +85,75 @@ if [ "$EUID" -eq 0 ]; then
     } >> /etc/environment
     echo "✓ Appended to /etc/environment (system-wide)"
 else
-    # User: append to ~/.profile
-    read -p "Append to ~/.profile? (y/n) " -n 1 -r
-    echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
+    # User: update both ~/.profile and ~/.bashrc
+    # In WSL, interactive shells load ~/.bashrc, not ~/.profile
+    # So we need to set variables in both places
+    
+    # Function to remove old Cursor/MCP section from a file
+    remove_old_section() {
+        local file_path="$1"
+        if [ ! -f "$file_path" ]; then
+            return
+        fi
+        
+        python3 << PYEOF || true
+import sys
+import os
+import re
+
+file_path = "$file_path"
+try:
+    with open(file_path, 'r') as f:
+        lines = f.readlines()
+    
+    # Find start of Cursor/MCP section
+    start_idx = None
+    for i, line in enumerate(lines):
+        if re.match(r'^# Cursor/MCP environment variables', line):
+            start_idx = i
+            break
+    
+    if start_idx is not None:
+        # Find end: next empty line after POSTMAN_API_KEY or end of file
+        end_idx = len(lines)
+        found_postman = False
+        for i in range(start_idx + 1, len(lines)):
+            if re.match(r'^export POSTMAN_API_KEY', lines[i]):
+                found_postman = True
+            if found_postman and (lines[i].strip() == '' or i == len(lines) - 1):
+                end_idx = i + 1
+                break
+        
+        # Remove the section
+        new_lines = lines[:start_idx] + lines[end_idx:]
+        with open(file_path, 'w') as f:
+            f.writelines(new_lines)
+except Exception as e:
+    sys.stderr.write(f"Warning: Could not remove old section from {file_path}: {e}\n")
+PYEOF
+    }
+    
+    # Update ~/.profile (for login shells)
+    if [ -f ~/.profile ]; then
+        BACKUP_FILE="$HOME/.profile.backup.$(date +%Y%m%d_%H%M%S)"
+        cp ~/.profile "$BACKUP_FILE" 2>/dev/null || true
+        echo "✓ Created backup: $BACKUP_FILE"
+        remove_old_section ~/.profile
+    fi
+    
+    # Update ~/.bashrc (for interactive shells - used in WSL)
+    if [ -f ~/.bashrc ]; then
+        BACKUP_FILE="$HOME/.bashrc.backup.$(date +%Y%m%d_%H%M%S)"
+        cp ~/.bashrc "$BACKUP_FILE" 2>/dev/null || true
+        remove_old_section ~/.bashrc
+    fi
+    
+    # Function to append environment variables to a file
+    append_env_vars() {
+        local file_path="$1"
         {
             echo ""
-            echo "# Cursor/MCP environment variables (from .env)"
+            echo "# Cursor/MCP environment variables (from .env) - $(date '+%Y-%m-%d %H:%M:%S')"
             echo "export CURSOR_CONFIG_DIR=\"$CURSOR_CONFIG_DIR\""
             echo "export NEO4J_URI=\"$NEO4J_URI\""
             echo "export NEO4J_USERNAME=\"$NEO4J_USERNAME\""
@@ -101,7 +163,14 @@ else
             echo "export GRAFANA_URL=\"$GRAFANA_URL\""
             [ -n "$GRAFANA_API_KEY" ] && [ "$GRAFANA_API_KEY" != "CHANGE_ME" ] && echo "export GRAFANA_API_KEY=\"$GRAFANA_API_KEY\""
             [ -n "$POSTMAN_API_KEY" ] && [ "$POSTMAN_API_KEY" != "CHANGE_ME" ] && echo "export POSTMAN_API_KEY=\"$POSTMAN_API_KEY\""
-        } >> ~/.profile
-        echo "✓ Appended to ~/.profile"
-    fi
+        } >> "$file_path"
+    }
+    
+    # Append to ~/.profile (for login shells)
+    append_env_vars ~/.profile
+    echo "✓ Updated ~/.profile with variables from .env"
+    
+    # Append to ~/.bashrc (for interactive shells - used in WSL)
+    append_env_vars ~/.bashrc
+    echo "✓ Updated ~/.bashrc with variables from .env"
 fi
