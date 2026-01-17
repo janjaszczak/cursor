@@ -1,3 +1,5 @@
+<!-- .cursor/skills/vanilla-web/references/checklist.md -->
+
 # Vanilla Web – Done Checklist
 
 ## HTML

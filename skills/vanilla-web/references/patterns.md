@@ -1,3 +1,5 @@
+<!-- .cursor/skills/vanilla-web/references/patterns.md -->
+
 # Patterns
 
 ## Minimal module pattern
