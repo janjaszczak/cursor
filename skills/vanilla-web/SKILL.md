@@ -1,7 +1,9 @@
 ---
 name: vanilla-web
 description: Build or modify plain HTML/CSS/JavaScript (no framework) using modular ES modules (ESM), SRP, minimal global state, and shippable runnable files with lightweight verification. Use for static pages, small UI widgets, vanilla JS refactors, and quick prototypes without React/Vue/Angular.
-compatibility: Cursor Agent Skills (Nightly). Project skill location: .cursor/skills/vanilla-web/SKILL.md. Assumes a browser-run environment; optional local server via python3 for manual verification.
+compatibility: >
+  Cursor Agent Skills (Nightly). Project skill location: .cursor/skills/vanilla-web/SKILL.md.
+  Assumes a browser-run environment; optional local server via python3 for manual verification.
 metadata:
   author: janjaszczak
   version: "1.0"
