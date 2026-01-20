@@ -30,6 +30,8 @@ There are TWO different `.cursor` roots:
   - `$HOME` (macOS/Linux) or `%USERPROFILE%` (Windows)
 - USER_CURSOR_DIR (global):
   - `${USER_HOME}/.cursor`
+- USER_COMMANDS_DIR (global):
+  - `${USER_CURSOR_DIR}/commands`
 - USER_SKILLS_DIR (global; DEFAULT for SKILLS group in this project):
   - `${USER_CURSOR_DIR}/skills`
 
@@ -184,10 +186,39 @@ Prefer Shrimp tasks if Shrimp tools are available; otherwise produce the same se
 
 ## If Shrimp is available: deliver as tasks
 
+### Instantiate tasks with Shrimp (parameter mapping)
+
+#### `plan_task` (what to pass)
+Call `plan_task` with:
+- `description`: "Run /retro on the current chat thread. Produce tasks matching OUTPUT FORMAT (0, 1, 2, 3.1–3.4, 4). Stop after the Selection Task and wait for the user to type exactly: APPLY before creating/executing the Apply Task."
+- `requirements`: include constraints from CAPABILITY CHECK, EVIDENCE RULE, INTERACTIVE APPLY MODEL, and DRY/KISS limits (no inventions; toolsets optional; no auto-apply).
+
+#### `split_tasks` (how to map OUTPUT FORMAT → task definitions)
+Then call `split_tasks` with:
+- `updateMode`: `clearAllTasks`
+- `tasksRaw`: a JSON array defining **8 tasks**: 0, 1, 2, 3.1–3.4, 4 (do **not** create task 5 yet).
+
+Notes:
+- You do **not** pass task IDs to `split_tasks`. You pass task definitions; IDs are created by Shrimp.
+- After `split_tasks`, call `list_tasks` and map **task name → taskId** for `execute_task`.
+- If the chat used /commands, read the relevant specs under `${USER_COMMANDS_DIR}` before auditing expected behavior.
+
+#### `split_tasks` (after user types APPLY → create Apply Task)
+After the user types exactly `APPLY`, create the Apply Task by calling `split_tasks` again:
+- `updateMode`: `append`
+- `tasksRaw`: JSON array with **one** task:
+  - name: "Apply selected improvements"
+  - dependencies: ["Present selection checklist to user"]
+
+#### `execute_task` / `verify_task` (how to use task IDs)
+- `execute_task`: pass the `taskId` values returned by `list_tasks`, in dependency order.
+- `verify_task`: pass the Apply Task’s `taskId` and include a brief completion summary + score.
+
 0) Snapshot Task
 - Task name: "Create retrospective snapshot"
 - Must include:
   - PROJECT_ROOT + PROJECT_RULES_DIR
+  - USER_COMMANDS_DIR
   - USER_SKILLS_DIR
   - What the user was trying to achieve + what success means (1 short paragraph)
 
@@ -286,10 +317,20 @@ Prefer Shrimp tasks if Shrimp tools are available; otherwise produce the same se
 ---
 
 # EXECUTION WORKFLOW
-1) Start: (if Shrimp available) plan_task → split_tasks → list_tasks
-2) Execute sequentially in dependency order using execute_task
-3) Stop after Selection Task and wait for user input
-4) After user types APPLY: execute Apply Task + verify_task
+1) Capability check:
+   - Determine whether Shrimp tools are available.
+   - If the chat used /commands, identify which ones and read the relevant specs under `${USER_COMMANDS_DIR}` before auditing expected behavior.
+
+2) If Shrimp is available:
+   - `plan_task` → `split_tasks` (create tasks 0, 1, 2, 3.1–3.4, 4) → `list_tasks`
+   - Execute tasks sequentially in dependency order using `execute_task`
+   - Stop after the Selection Task and wait for user input
+   - After user types exactly `APPLY`: `split_tasks` (append Apply Task) → `list_tasks` → `execute_task` (Apply) → `verify_task`
+
+3) If Shrimp is NOT available:
+   - Produce the same sections as headings (Snapshot, Issues & Evidence, Compliance Audit, Proposed Improvements (4 subsections), Selection).
+   - Stop after Selection and wait for user input.
+   - After user types exactly `APPLY`: perform the Apply step inline (only selected items) and include a short verification checklist (correct dirs modified; no accidental collateral edits).
 
 Optional: UNCERTAIN
 - List uncertainties with the shortest verification method (log/test/source/user confirm).
