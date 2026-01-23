@@ -1,0 +1,9 @@
+# Security Rules
+
+## KeePassXC Integration Architecture
+
+- **Keyring storage** (PowerShell SecretManagement/secret-tool): Stores **ONLY** the KeePassXC database password
+- **KeePassXC database**: Stores **EXCLUSIVELY** all actual secrets (passwords, tokens, API keys, SSH keys)
+- **No file-based fallbacks**: All password storage uses secure keyring mechanisms only
+
+**Verification**: Before implementing KeePassXC features, verify "what goes where" - keyring = database password only, KeePassXC = all secrets.

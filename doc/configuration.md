@@ -70,18 +70,113 @@ The script reads `env.local` and sets environment variables. Variables marked as
 - This file is committed to Git (not in `.gitignore`)
 - Rotate secrets regularly
 
-### KeePass Integration
+### KeePassXC Integration
 
-For secure secret management:
+Secure secret management using KeePassXC with separate database for Cursor.
 
-1. Store all secrets in KeePass
-2. Use KeePassXC CLI or a startup script to populate environment variables before launching Cursor
-3. Never commit secrets to Git
+#### Configuration
 
-Example KeePassXC CLI usage:
+**Database Location:**
+- WSL: `/mnt/c/Users/janja/OneDrive/Dokumenty/Inne/cursor.kdbx`
+- Windows: `C:\Users\janja\OneDrive\Dokumenty\Inne\cursor.kdbx`
+
+**Environment Variable:**
+- `KEEPASS_DB_PATH` - Set in `~/.profile` and `~/.bashrc` (WSL)
+
+**Password Storage for Database:**
+- **PowerShell SecretManagement** (primary method, stores database password only, accessible from both Windows and WSL)
+- **secret-tool** (optional fallback for WSL, if D-Bus available)
+- **Windows Credential Manager** (backup, write-only, cannot be read programmatically)
+
+**Important:** 
+- SecretManagement/secret-tool store **ONLY** the KeePassXC database password (stored securely in keyring, never in files or documentation), not passwords from the database
+- All actual secrets/passwords (API tokens, service passwords, etc.) are stored **exclusively** in the KeePassXC database itself
+- No file-based fallback exists - all password storage uses secure keyring mechanisms
+
+Password is automatically saved by `save-keepass-password-to-keyring.sh` when database is open in GUI.
+
+#### Usage
+
+**Helper Script (Recommended):**
+
 ```bash
-export GITHUB_PAT=$(keepassxc-cli show -a Password /path/to/db.kdbx "GitHub Token")
+# Get password from entry
+~/.cursor/scripts/get-keepass-secret.sh "Entry Title" "Password"
+
+# Get API token
+~/.cursor/scripts/get-keepass-secret.sh "GitHub Token" "Token"
+
+# Get any attribute
+~/.cursor/scripts/get-keepass-secret.sh "Entry Title" "Attribute Name"
 ```
+
+**Direct keepassxc-cli:**
+
+```bash
+# List all entries
+keepassxc-cli ls "$KEEPASS_DB_PATH"
+
+# Show entry details
+keepassxc-cli show "$KEEPASS_DB_PATH" "Entry Title"
+
+# Get specific attribute
+keepassxc-cli show -a "Password" "$KEEPASS_DB_PATH" "Entry Title"
+```
+
+**Save password to keyring:**
+
+```bash
+# Run script (requires database open in GUI)
+~/.cursor/scripts/save-keepass-password-to-keyring.sh
+```
+
+#### SSH Agent
+
+KeePassXC SSH Agent automatically loads SSH keys from database to system SSH agent when database is open in GUI.
+
+**Verification:**
+```powershell
+# In PowerShell (Windows)
+ssh-add -l
+```
+
+SSH keys are automatically available for all SSH connections (no need to specify `-i`).
+
+#### Examples
+
+**Get GitHub token:**
+```bash
+GITHUB_TOKEN=$(~/.cursor/scripts/get-keepass-secret.sh "GitHub Token" "Token")
+export GITHUB_TOKEN
+```
+
+**Get database password:**
+```bash
+DB_PASSWORD=$(~/.cursor/scripts/get-keepass-secret.sh "Database Credentials" "Password")
+```
+
+#### Database Synchronization
+
+The `cursor.kdbx` database can be synchronized with the main `jjaszczak.kdbx` database using:
+- **KeeShare** (recommended) - GUI-based synchronization
+- **Merge** - One-time database merge
+
+See integration plan for detailed instructions.
+
+#### Security Best Practices
+
+1. **Never commit passwords to Git or documentation** - All secrets are in KeePassXC database. The database password must never appear in plain text in any file, including documentation.
+2. **Use SSH Agent** - SSH keys are automatically loaded, not stored on disk
+3. **Password in SecretManagement** - Safer than environment variables or files
+4. **Separate Cursor database** - Isolation of Cursor secrets from main database
+5. **Regular synchronization** - Use KeeShare or Merge to sync with main database
+6. **Only database password in keyring** - All other secrets are exclusively in KeePassXC database
+
+#### Documentation
+
+- **Skill:** `~/.cursor/skills/keepass-integration/SKILL.md`
+- **Integration Plan:** `~/.cursor/plans/keepassxc_integration_setup_6191af80.plan.md`
+- **Scripts:** `~/.cursor/scripts/get-keepass-secret.sh`, `~/.cursor/scripts/save-keepass-password-to-keyring.sh`
 
 ## Repository Synchronization
 
