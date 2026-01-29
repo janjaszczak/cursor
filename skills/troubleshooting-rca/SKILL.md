@@ -22,7 +22,7 @@ Skip when:
    - Command, input, environment, last known good commit.
 3. Hypotheses (max 3) ranked by likelihood.
 4. Test each hypothesis with the smallest possible check.
-5. Fix + verify with test/run.
+5. **Before Fix:** Root cause must be clearly stated; one minimal verification step must be given. Then: Fix + verify with test/run.
 6. Add a prevention note (test, guard, logging).
 
 ## Output
