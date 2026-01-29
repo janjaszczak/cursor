@@ -8,6 +8,8 @@ compatibility:
 
 # Skill: KeePassXC Integration
 
+**KeePassXC** is a local password manager: it stores entries (Title, Username, Password, URL, Notes) in an encrypted `.kdbx` database. There is no cloud API; the database is a single file. Access is via GUI or `keepassxc-cli`.
+
 ## Activation Gate
 
 Użyj tego skill gdy:
@@ -23,6 +25,12 @@ Użyj tego skill gdy:
 ## Przegląd
 
 Ten skill umożliwia bezpieczne zarządzanie sekretami przez KeePassXC z poziomu Cursora. Używa osobnej bazy `cursor.kdbx` z hasłem przechowywanym w PowerShell SecretManagement, SSH Agent dla kluczy SSH, oraz `keepassxc-cli` dla innych sekretów.
+
+## Struktura danych w bazie
+
+- **Grupy:** używaj hierarchii `{project_name}/{env_name}` (np. `myapp/prod`, `myapp/dev`). Ścieżka wpisu w CLI to np. `ProjectName/EnvName/EntryTitle`.
+- **Wpisy:** pole **Title** = nazwa sekretu (np. "GitHub Token", "API Key"); pole **Password** = wartość sekretu. Dla API key trzymaj wartość w Password, opcjonalnie Username = "api".
+- **Po co:** spójna struktura umożliwia check-before-add (unikanie duplikatów) i skrypty oparte na ścieżce.
 
 ## Konfiguracja
 
@@ -85,6 +93,25 @@ echo "hasło" | keepassxc-cli show -a "Password" "$KEEPASS_DB_PATH" "Entry Title
 # Uruchom skrypt (wymaga otwartej bazy w GUI)
 ~/.cursor/scripts/save-keepass-password-to-keyring.sh
 ```
+
+## Dodawanie i aktualizacja wpisów
+
+**Obowiązkowy workflow przed zapisem (check-before-add):** Zawsze sprawdź, czy grupa i wpis istnieją; nie dodawaj duplikatu.
+
+1. **Sprawdzenie:** `keepassxc-cli ls "$KEEPASS_DB_PATH" "ProjectName/EnvName"` (ew. `-R`) lub `keepassxc-cli locate "$KEEPASS_DB_PATH" "EntryTitle"` — czy wpis już jest?
+2. **Jeśli wpis istnieje** → użyj **edit**, nie add: `keepassxc-cli edit "$KEEPASS_DB_PATH" "ProjectName/EnvName/EntryTitle"` (opcje `-t`, `-u`, `--url`, `-p`/`-g` dla hasła).
+3. **Jeśli brak grupy** → najpierw **mkdir:** `keepassxc-cli mkdir "$KEEPASS_DB_PATH" "ProjectName/EnvName"`.
+4. **Jeśli wpisu nie ma** → **add:** `keepassxc-cli add "$KEEPASS_DB_PATH" "ProjectName/EnvName/EntryTitle"` z `-u username`, `--url` (opcjonalnie), `-p` (prompt hasła) lub `-g` (generuj hasło).
+
+**Komendy keepassxc-cli:** `add`, `edit`, `show`, `ls`, `locate`, `mkdir`, `rm`. Ograniczenia: w wielu wersjach CLI **add** i **edit** nie obsługują custom attributes ani Notes; tylko Title, Username, URL, Password.
+
+**Scenariusze:**
+- **Odczyt:** istniejący skrypt get-keepass-secret lub `keepassxc-cli show` (ścieżka lub tytuł wpisu).
+- **Zapis nowego sekretu:** check (ls/locate) → mkdir grupy jeśli brak → add wpisu.
+- **Aktualizacja sekretu:** locate/show → edit (zmiana hasła/username).
+- **Inicjalizacja struktury:** mkdir `ProjectName`, mkdir `ProjectName/EnvName`.
+
+**Skrypty Pythona:** Po wdrożeniu użyj `scripts/keepass_ops.py` (subkomendy get/add/update) dla spójnego check-before-add; szczegóły w [doc/keepass-integration.md](~/.cursor/doc/keepass-integration.md). Dla zaawansowanych przypadków nadal możesz wywoływać `keepassxc-cli` bezpośrednio.
 
 ## SSH Agent
 
@@ -201,6 +228,7 @@ Szczegółowe instrukcje w planie integracji.
 
 ## Dokumentacja
 
+- **Runbook (odtworzenie na innej maszynie):** `~/.cursor/doc/keepass-integration.md`
 - Plan integracji: `~/.cursor/plans/keepassxc_integration_setup_6191af80.plan.md`
 - Konfiguracja: `~/.cursor/doc/configuration.md`
-- Skrypty: `~/.cursor/scripts/`
+- Skrypty: `~/.cursor/scripts/` (get-keepass-secret.sh, save-keepass-password-to-keyring.sh, keepass_ops.py)

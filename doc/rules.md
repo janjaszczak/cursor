@@ -115,9 +115,9 @@ These rules apply only to files matching specific glob patterns:
 ## Rule Priority
 
 1. Context-specific rules (`.cursor/rules/*.mdc` with globs)
-2. Global rules (`cursor-user_roles.txt` at repository root - highest priority)
+2. Global rules (highest priority)
 
-**Note:** `cursor-user_roles.txt` serves as the primary source for global engineering policies, MCP tools usage, and workflow instructions. Context-specific rules in `.cursor/rules/` complement these global rules for specific file patterns.
+**Note:** Global rules may live in **USER_RULES.txt** in the user `.cursor` directory (`~/.cursor/USER_RULES.txt`) or, in a project repo, as **cursor-user_roles.txt** at the repository root. Context-specific rules in `.cursor/rules/` complement global rules for specific file patterns.
 
 ## Best Practices
 

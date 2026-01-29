@@ -29,11 +29,15 @@ All documentation is in the **[doc/](doc/)** directory:
 ├── commands/             # Custom commands
 ├── scripts/               # Setup and utility scripts
 │   ├── setup-env-vars.*  # Environment variable setup
-│   ├── sync-repo.*       # Git repository synchronization
 │   ├── verify-config.*   # Configuration verification
-│   └── fix-mcp-duplicates.*  # Fix MCP duplicate issues
+│   ├── get-keepass-secret.*  # KeePassXC secret retrieval
+│   ├── save-keepass-password-to-keyring.*  # KeePass keyring setup
+│   ├── keepass_ops.py    # KeePass get/add/update (Python)
+│   ├── build-mcp-images.*  # Build MCP Docker images
+│   ├── check-docker-images.*  # Check MCP image availability
+│   └── test-mcp-servers.*  # Test MCP server configuration
 ├── doc/                  # Documentation
-├── env.local.example     # Template for env.local
+├── .env.example          # Template for .env
 └── README.md             # This file
 ```
 
@@ -42,7 +46,7 @@ All documentation is in the **[doc/](doc/)** directory:
 - **Single source of truth**: All Cursor config in `.cursor/` directory
 - **Cross-platform**: Works on Windows and WSL with same configuration
 - **MCP servers**: All MCPs run in Docker containers for cross-platform consistency
-- **Git sync**: Scripts to synchronize configuration across machines
+- **Git**: Use `git pull` / `git push` or your preferred method to sync configuration across machines
 - **Secure**: Secrets in environment variables, not in config files
 
 ## MCP Servers

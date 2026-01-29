@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "hooks": {
+    "preToolUse": [
+      {
+        "command": ".cursor/hooks/guard-secret-write.py",
+        "matcher": "Write"
+      }
+    ],
+    "beforeShellExecution": [
+      {
+        "command": ".cursor/hooks/guard-shell-secret.py",
+        "matcher": "\\.env|>>\\s*\\.env|>\\s*\\.env|tee.*\\.env"
+      }
+    ],
+    "beforeMCPExecution": [
+      {
+        "command": ".cursor/hooks/guard-mcp-write.py"
+      }
+    ]
+  }
+}

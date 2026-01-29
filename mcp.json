@@ -9,7 +9,7 @@
         "--network",
         "mcp-network",
         "-e",
-        "NEO4J_URI",
+        "NEO4J_URI=neo4j://neo4j:7687",
         "-e",
         "NEO4J_USERNAME",
         "-e",

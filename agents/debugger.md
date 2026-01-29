@@ -19,3 +19,5 @@ For each issue, provide:
 - Testing approach
 
 Focus on fixing the underlying issue, not symptoms.
+
+**Preferred MCP:** Read (files), Bash (repro/tests). Optional: memory (recall similar bugs). Align with troubleshooting-rca skill for RCA.

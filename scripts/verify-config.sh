@@ -127,19 +127,6 @@ else
     echo "  ℹ Shrimp volume will be created automatically on first run"
 fi
 
-# Check sync scripts
-echo ""
-echo "Checking sync scripts..."
-USER_CURSOR_PATH="$HOME/.cursor"
-for script in "$USER_CURSOR_PATH/scripts/sync-repo.ps1" "$USER_CURSOR_PATH/scripts/sync-repo.sh"; do
-    if [ -f "$script" ]; then
-        echo "  ✓ $(basename $script) exists"
-    else
-        warnings+=("Sync script missing: $script")
-        echo "  ⚠ $(basename $script) missing"
-    fi
-done
-
 # Summary
 echo ""
 echo "=== Verification Summary ==="

@@ -41,34 +41,58 @@ After setting, restart Cursor for changes to take effect.
 
 ### MCP Environment Variables
 
-**IMPORTANT:** All MCP servers run in Docker containers, and Docker runs in WSL. Therefore, MCP environment variables should be set **only in WSL**, not in Windows.
+**IMPORTANT:** Cursor passes MCP env vars from **the environment of the process that runs Cursor**. So they must be set in **Windows** when you start Cursor on Windows, and in **WSL** when you start Cursor from WSL.
 
-**Required variables (WSL only):**
-- `NEO4J_URI` - Neo4j connection URI (e.g., `neo4j://localhost:7687`)
-- `NEO4J_USERNAME` - Neo4j username
-- `NEO4J_PASSWORD` - Neo4j password
-- `NEO4J_DATABASE` - Database name (default: `neo4j`)
-- `GITHUB_PERSONAL_ACCESS_TOKEN` - GitHub PAT
-- `GRAFANA_URL` - Grafana instance URL
-- `GRAFANA_API_KEY` - Grafana API key
+**Required variables:**
+- `NEO4J_URI` - Fixed in `mcp.json` as `neo4j://neo4j:7687` (no need to set in env).
+- `NEO4J_USERNAME`, `NEO4J_PASSWORD`, `NEO4J_DATABASE` - Neo4j auth (must be in Cursor’s environment).
+- `GITHUB_PERSONAL_ACCESS_TOKEN`, `GRAFANA_URL`, `GRAFANA_API_KEY`, `POSTMAN_API_KEY` - As needed.
 
-**Setting in WSL:**
-1. Edit `env.local` file with your actual secrets (located in `~/.cursor/env.local`)
-2. Run the setup script:
+**When Cursor runs on Windows:**
+1. Edit `.env` in your `.cursor` folder (e.g. `C:\Users\<you>\.cursor\.env`).
+2. Run PowerShell **as Administrator**, then:
+   ```powershell
+   cd $env:USERPROFILE\.cursor
+   .\scripts\setup-env-vars.ps1
+   ```
+   The script reads `.env` and sets **Windows User** environment variables (NEO4J_*, GITHUB_*, etc.). Variables marked `CHANGE_ME` or empty are skipped.
+3. **Restart Cursor** so it picks up the new User env. You can start Cursor from the Start menu or any shortcut.
+
+**When Cursor runs on WSL:**
+1. Edit `.env` (e.g. `~/.cursor/.env`).
+2. Either run the setup script so vars are in your shell profile, or source `.env` before starting Cursor:
    ```bash
    cd ~/.cursor
-   ./scripts/setup-env-vars.sh
-   # Or with sudo for system-wide:
-   sudo ./scripts/setup-env-vars.sh
+   ./scripts/setup-env-vars.sh   # optional: --profile / --bashrc
+   # Then start Cursor from a shell that has those vars, e.g.:
+   set -a && source .env && set +a && cursor .
    ```
 
-The script reads `env.local` and sets environment variables. Variables marked as `CHANGE_ME` or empty are skipped.
-
-**File: `env.local`**
+**File: `.env`**
 - Contains all environment variables needed for MCP servers
 - Format: `KEY=VALUE` (one per line, comments start with `#`)
-- This file is committed to Git (not in `.gitignore`)
+- Not committed (in `.gitignore`); use `.env.example` as template
 - Rotate secrets regularly
+
+**Neo4j memory server — connection from Docker:**  
+`mcp.json` uses a fixed URI `neo4j://neo4j:7687` (container name on `mcp-network`). Cursor passes only `NEO4J_USERNAME`, `NEO4J_PASSWORD`, `NEO4J_DATABASE` from your environment to the container.
+
+- **Neo4j must be running in Docker on `mcp-network`.** One-time setup:
+  ```bash
+  cd ~/.cursor
+  export NEO4J_PASSWORD=your_password   # or: set -a; source .env; set +a
+  ./scripts/start-neo4j-mcp.sh
+  ```
+  Or manually: `docker network create mcp-network 2>/dev/null || true` then  
+  `docker run -d --name neo4j --network mcp-network -p 7687:7687 -e NEO4J_AUTH=neo4j/YOUR_PASSWORD neo4j:latest`
+
+- **Cursor must see `NEO4J_USERNAME`, `NEO4J_PASSWORD`, `NEO4J_DATABASE`** when it starts MCP:  
+  **Windows:** run `setup-env-vars.ps1` as Administrator (sets User env from `.env`), then restart Cursor.  
+  **WSL:** run Cursor from a shell that has sourced `.env` or has vars from `setup-env-vars.sh` (e.g. in `~/.profile`).
+
+- **Neo4j container** can be started from WSL (`./scripts/start-neo4j-mcp.sh`) or from Windows (same Docker daemon with Docker Desktop WSL2 backend).
+
+If MCP still logs "Failed to connect to Neo4j": (1) confirm container is up: `docker ps | grep neo4j`; (2) **Windows:** check User env in PowerShell: `[Environment]::GetEnvironmentVariable('NEO4J_PASSWORD','User')`.
 
 ### KeePassXC Integration
 
@@ -174,32 +198,10 @@ See integration plan for detailed instructions.
 
 #### Documentation
 
+- **Runbook (reproduce on another machine):** [doc/keepass-integration.md](keepass-integration.md)
 - **Skill:** `~/.cursor/skills/keepass-integration/SKILL.md`
 - **Integration Plan:** `~/.cursor/plans/keepassxc_integration_setup_6191af80.plan.md`
 - **Scripts:** `~/.cursor/scripts/get-keepass-secret.sh`, `~/.cursor/scripts/save-keepass-password-to-keyring.sh`
-
-## Repository Synchronization
-
-Use the sync script to keep the repository synchronized across machines:
-
-**Windows:**
-```powershell
-.\scripts\sync-repo.ps1
-```
-
-**WSL:**
-```bash
-./scripts/sync-repo.sh
-```
-
-**From Cursor:**
-Add a keyboard shortcut in Cursor settings to run the sync script on demand.
-
-The script will:
-- Check for uncommitted changes (fails if found, unless `--force` is used)
-- Fetch from remote
-- Pull and rebase if behind
-- Push local commits if ahead
 
 ## Shrimp Task Manager
 
@@ -225,22 +227,17 @@ Available utility scripts:
 
 **Windows (run as Administrator):**
 - `setup-env-vars.ps1` - Set `CURSOR_CONFIG_DIR` in Windows
-- `sync-repo.ps1` - Git repository synchronization
 - `verify-config.ps1` - Configuration verification
-- `fix-mcp-duplicates.ps1` - Fix MCP duplicate issues
 
 **WSL:**
 - `setup-env-vars.sh` - Set MCP environment variables in WSL
-- `sync-repo.sh` - Git repository synchronization
 - `verify-config.sh` - Configuration verification
-- `fix-mcp-duplicates.sh` - Fix MCP duplicate issues
 
 **MCP Management Scripts:**
 - `build-mcp-images.{ps1,sh}` - Build custom Docker images
 - `test-mcp-servers.{ps1,sh}` - Test MCP server configuration
 - `check-docker-images.{ps1,sh}` - Check Docker image availability
 - `analyze-mcp-usage.{ps1,sh}` - Analyze MCP server usage
-- `generate-mcp-config.{ps1,sh}` - Generate mcp.json dynamically
 
 **Note:** Legacy MCP wrapper scripts have been archived. All MCP servers now use Docker for cross-platform consistency.
 
@@ -270,11 +267,11 @@ This directory contains:
 - MCP environment variables (all in WSL):
   - `NEO4J_URI` = `neo4j://localhost:7687`
   - `NEO4J_USERNAME` = `neo4j`
-  - `NEO4J_PASSWORD` = (set in `env.local`)
+  - `NEO4J_PASSWORD` = (set in `.env`)
   - `NEO4J_DATABASE` = `neo4j`
-  - `GITHUB_PERSONAL_ACCESS_TOKEN` = (set in `env.local`)
+  - `GITHUB_PERSONAL_ACCESS_TOKEN` = (set in `.env`)
   - `GRAFANA_URL` = `http://localhost:3001`
-  - `GRAFANA_API_KEY` = (set in `env.local`)
+  - `GRAFANA_API_KEY` = (set in `.env`)
 
 ### MCP Servers
 
@@ -304,10 +301,24 @@ All MCPs execute via Docker for cross-platform consistency (Windows and WSL).
 
 ### Commands
 
-2 custom commands are defined:
+4 custom commands are defined:
 
-1. `/save_memory` - Force write to Neo4j memory
-2. `/recall_memory` - Search Neo4j memory first
+1. `/save_memory` - Force write to Neo4j memory (no extra confirmation)
+2. `/recall_memory` - Search Neo4j memory first before starting work
+3. `/cleanup` - Post-work repo hygiene: audit → proposal → apply only after "APPLY CLEANUP"
+4. `/retro` - Chat retrospective: issues, compliance audit, proposed improvements (USER RULES / PROJECT RULES / SKILLS / MEMORY); interactive APPLY
+
+See [commands.md](commands.md) for full descriptions.
+
+### Hooks
+
+Cursor Agent Hooks allow observing and gating agent actions (e.g. require user authorization before writing secrets to files).
+
+- **Configuration:** `~/.cursor/hooks.json` (user-level) or `<project>/.cursor/hooks.json` (project-level)
+- **Scripts:** `~/.cursor/hooks/` or `.cursor/hooks/` (paths relative to config location)
+- **Policy in this setup:** Do not block reading secret files; require authorization for **writing** secrets (e.g. to `.env`). Use preToolUse (Write), beforeShellExecution (matcher for .env), beforeMCPExecution.
+
+See [hooks.md](hooks.md) for details and [Cursor Hooks](https://cursor.com/docs/agent/hooks) for the official reference.
 
 ### Global Configuration
 
@@ -321,12 +332,12 @@ All MCPs execute via Docker for cross-platform consistency (Windows and WSL).
 
 ### Secrets Management
 
-**File:** `env.local` (committed to Git)
+**File:** `.env` (not committed, in `.gitignore`)
 - Contains all MCP environment variable values
 - Format: `KEY=VALUE` (one per line)
 - Rotate secrets regularly
 
-**Template:** `env.local.example`
+**Template:** `.env.example`
 - Shows required variables without actual values
 
 ### Git Repository
@@ -334,7 +345,7 @@ All MCPs execute via Docker for cross-platform consistency (Windows and WSL).
 **Location:** `C:\Users\janja\.cursor\` (Windows) / `~/.cursor/` (WSL)
 **Remote:** `https://github.com/janjaszczak/cursor-config.git` (to be configured)
 **Branch:** `main`
-**Sync:** Use `scripts/sync-repo.{ps1,sh}` to synchronize between Windows and WSL via GitHub
+**Sync:** Use Git manually (e.g. `git pull` / `git push`) or your preferred sync method to keep config in sync across machines.
 
 ### Verification
 
@@ -361,30 +372,23 @@ Run verification scripts to check setup:
 
 **Step 1: Fix Windows Configuration**
 
-Run as Administrator:
-```powershell
-cd C:\Users\janja\.cursor
-.\scripts\fix-mcp-duplicates.ps1
-```
-
-This script will:
-- Set `CURSOR_CONFIG_DIR` to point to user `.cursor` directory
-- Backup and minimize global `%USERPROFILE%\.cursor\mcp.json`
-- Verify user config is correct
+1. Set `CURSOR_CONFIG_DIR` to point to your user `.cursor` directory (e.g. `C:\Users\janja\.cursor`). Run as Administrator:
+   ```powershell
+   [Environment]::SetEnvironmentVariable("CURSOR_CONFIG_DIR", "C:\Users\janja\.cursor", "User")
+   ```
+2. Backup and minimize global `%USERPROFILE%\.cursor\mcp.json` (e.g. replace contents with `{"mcpServers":{}}` or move the file aside).
+3. Ensure your actual MCP config lives in the user `.cursor\mcp.json` (the one under `CURSOR_CONFIG_DIR`).
 
 **Step 2: Fix WSL Configuration**
 
 In WSL terminal:
 ```bash
-cd ~/.cursor
-./scripts/fix-mcp-duplicates.sh
+# Add CURSOR_CONFIG_DIR to ~/.profile if not set
+echo 'export CURSOR_CONFIG_DIR="$HOME/.cursor"' >> ~/.profile
 source ~/.profile
+# Backup and minimize global ~/.cursor/mcp.json if it exists outside CURSOR_CONFIG_DIR
+# Ensure MCP config is in the directory pointed to by CURSOR_CONFIG_DIR
 ```
-
-This script will:
-- Add `CURSOR_CONFIG_DIR` to `~/.profile`
-- Backup and minimize global `~/.cursor/mcp.json`
-- Verify user config is correct
 
 **Step 3: Set Environment Variables**
 
@@ -445,5 +449,5 @@ This sets all MCP environment variables in WSL (where MCPs actually run).
 
 Some scripts require elevated privileges:
 
-- **Windows**: `setup-env-vars.ps1`, `fix-mcp-duplicates.ps1` - Run PowerShell as Administrator
+- **Windows**: `setup-env-vars.ps1` - Run PowerShell as Administrator to set `CURSOR_CONFIG_DIR`
 - **WSL**: `setup-env-vars.sh` - Use `sudo` for system-wide variables, or run without for user variables

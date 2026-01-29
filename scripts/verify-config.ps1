@@ -162,21 +162,6 @@ try {
     Write-Host "  [WARN] Cannot check Shrimp" -ForegroundColor Yellow
 }
 
-# Check sync scripts
-Write-Host "`nChecking sync scripts..." -ForegroundColor Yellow
-$syncScripts = @(
-    (Join-Path $userCursorPath "scripts\sync-repo.ps1"),
-    (Join-Path $userCursorPath "scripts\sync-repo.sh")
-)
-foreach ($script in $syncScripts) {
-    if (Test-Path $script) {
-        Write-Host "  [OK] $(Split-Path $script -Leaf) exists" -ForegroundColor Green
-    } else {
-        $warnings += "Sync script missing: $(Split-Path $script -Leaf)"
-        Write-Host "  [WARN] $(Split-Path $script -Leaf) missing" -ForegroundColor Yellow
-    }
-}
-
 # Summary
 Write-Host "`n=== Verification Summary ===" -ForegroundColor Cyan
 if ($errors.Count -eq 0 -and $warnings.Count -eq 0) {

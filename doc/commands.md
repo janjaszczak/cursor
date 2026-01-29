@@ -8,6 +8,8 @@ Custom commands are user-defined shortcuts that extend Cursor's functionality. T
 
 ## Available Commands
 
+Four custom commands are defined: `/save_memory`, `/recall_memory`, `/cleanup`, `/retro`.
+
 ### `/save_memory`
 
 **Purpose:** Force write to Neo4j memory (no extra confirmation)
@@ -65,6 +67,47 @@ Observations: "docker run -d --name neo4j -p 7687:7687 neo4j:latest"
 Topic: "GitHub MCP setup"
 Returns: Memory about GitHub token configuration and WSL setup
 ```
+
+### `/cleanup`
+
+**Purpose:** Post-work repo hygiene: audit scripts, docs, and artifacts; propose KEEP/MOVE/MERGE/DELETE; apply only after user types "APPLY CLEANUP"
+
+**Usage:**
+```
+/cleanup
+```
+
+**Behavior:**
+1. Preconditions: confirm Git branch and status; prefer Git as rollback (commit checkpoints per step)
+2. Memory-first: switch to project DB, run memory_find for cleanup/repo hygiene constraints
+3. Audit (no changes): collect git status, diff, candidate new files; identify canonical locations (docs, scripts, temp)
+4. Produce a cleanup proposal: table with actions (KEEP/MOVE/MERGE/DELETE), reason, target, risk; verification plan; ask for "APPLY CLEANUP"
+5. Apply only after user types **APPLY CLEANUP**: consolidate scripts/docs, remove garbage, update .gitignore minimally
+6. Verify: lint/tests/build
+7. Optional: propose 1–3 memories for canonical docs/scripts map
+
+**Output:** Proposal table; then after APPLY CLEANUP, execution summary and verification result.
+
+### `/retro`
+
+**Purpose:** Chat retrospective: analyze the conversation for issues and propose improvements to USER RULES, PROJECT RULES, SKILLS, and MEMORY
+
+**Usage:**
+```
+/retro
+```
+
+**Behavior:**
+1. Capability check: identify available tools (Shrimp, Neo4j memory)
+2. Resolve paths: PROJECT_ROOT, PROJECT_CURSOR_DIR, USER_CURSOR_DIR, USER_COMMANDS_DIR, USER_SKILLS_DIR
+3. Identify issues with evidence from the chat; audit adherence to instructions
+4. Propose improvements in four groups: USER RULES, PROJECT RULES, SKILLS, MEMORY TO SAVE
+5. Present selection checklist; wait for user to type **APPLY**
+6. After APPLY: apply only selected items (patches, Neo4j tool calls); verify
+
+**Output:** Snapshot, issues with evidence, compliance audit, proposed improvements per group, selection checklist; after APPLY, completion summary.
+
+**Note:** Uses Shrimp tasks if available; otherwise same sections as headings. See [commands/retro.md](../commands/retro.md) for full spec.
 
 ## Command Structure
 

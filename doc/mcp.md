@@ -231,7 +231,7 @@ If using volume mounts (not recommended for cross-platform):
 ## Security
 
 - **No secrets in `mcp.json`** - all sensitive data via environment variables
-- **Secrets in `env.local`** - committed to Git (rotate regularly)
+- **Secrets in `.env`** - not committed (rotate regularly)
 - **KeePass integration** - recommended for production secret management
 - **Never hardcode secrets** in `mcp.json`
 - **Use environment variables** for all sensitive data (`-e VAR_NAME`)

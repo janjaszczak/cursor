@@ -21,3 +21,5 @@ Report test results with:
 - Changes made to fix issues
 - Any remaining issues or flakiness
 - Final status
+
+**Preferred MCP:** Bash (run tests), Read (code). Optional: Postman (API tests/collections), Playwright (e2e/browser tests). If API or e2e tests are needed and the relevant MCP is unavailable: report to the user and suggest enabling the MCP in Cursor settings or starting the MCP server (e.g. Docker). Do not assume MCP is running.

@@ -16,3 +16,5 @@ Report findings by severity:
 - Critical (must fix before deploy)
 - High (fix soon)
 - Medium (address when possible)
+
+**Preferred MCP:** Read (code/config), Bash (run checks). Optional: memory (prior findings). Use high-risk-review skill for structured verification.
