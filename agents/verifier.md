@@ -20,3 +20,5 @@ Report:
 - Specific issues and recommendations
 
 Do not accept claims at face value. Test everything.
+
+**When the work was tracked in Shrimp:** Use the mcp-shrimp-execution-loop skill: load the relevant tasks, verify each (run tests / checks), and update task status and notes (pass / fail / partial) so the audit trail stays consistent.
