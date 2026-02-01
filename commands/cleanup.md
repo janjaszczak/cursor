@@ -49,7 +49,13 @@ Propose cleanup for:
 - logs: `*.log` (unless intentionally tracked)
 Rule: if tracked in Git, do NOT delete automatically; propose and ask.
 
-### 2.4 Do NOT touch (unless user explicitly asks)
+### 2.4 Project rules
+If `${PROJECT_CURSOR_DIR}/rules` exists:
+- List `*.mdc` files; check prefix convention (cursor-rules-principles / retro), flat structure (no subfolders in rules).
+- Propose RENAME (missing prefix), MERGE (duplicate content), DELETE only with justification; do not apply without confirmation.
+- Full audit and prefix convention: use skill maintain-project-rules or agent rules-keeper.
+
+### 2.5 Do NOT touch (unless user explicitly asks)
 - lockfiles: `poetry.lock`, `package-lock.json`, `pnpm-lock.yaml`, `yarn.lock`
 - env/secrets: `.env*`, key material, tokens
 - dependencies dirs: `node_modules/` (do not commit; only .gitignore updates)
@@ -91,5 +97,5 @@ After successful cleanup, propose 1–3 memories (ask user to approve):
 - canonical docs map (where to write what)
 - canonical scripts map + how to run key scripts
 - “cleanup checklist” and common pitfalls
-If user says **SAVE MEMORY:** store immediately using memory_store, after checking memory_find to avoid duplicates.
+If user says **SAVE MEMORY:** store immediately using create_entities (user-memory MCP), after checking search_memories to avoid duplicates.
 

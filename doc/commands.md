@@ -20,13 +20,9 @@ Four custom commands are defined: `/save_memory`, `/recall_memory`, `/cleanup`, 
 ```
 
 **Behavior:**
-1. Ensures correct project DB (calls `database_switch` if needed)
-2. Uses `memory_store` with:
-   - `name`: Concise, searchable title
-   - `memoryType`: One of `{howto, decision, constraint, location, lesson, snippet}`
-   - `observations`: Include exact commands, file paths, URLs, and pitfalls
-   - `metadata`: Tags, repo, date, confidence (high/med/low)
-3. Creates relations to existing memories if applicable (e.g., "DEPENDS_ON", "RELATED_TO")
+1. Uses **user-memory MCP** tools: `create_entities` (name, type, observations), `add_observations` for existing entities, `create_relations` to link. There is no `memory_store` or `database_switch` in this MCP.
+2. Before creating: optionally `search_memories` (query) to avoid duplicates.
+3. See [commands/save_memory.md](commands/save_memory.md) for full tool mapping.
 
 **Output:**
 - Memory ID(s)
@@ -50,8 +46,8 @@ Observations: "docker run -d --name neo4j -p 7687:7687 neo4j:latest"
 ```
 
 **Behavior:**
-1. Switches to project DB (`database_switch`)
-2. Runs `memory_find` for current topic
+1. Uses **user-memory MCP** tools: `search_memories` (query) for fulltext search; optionally `find_memories_by_name`. There is no `memory_find` or `database_switch` in this MCP.
+2. Runs search for current topic
 3. Returns:
    - Top matches (ID + name)
    - Most actionable observations (commands/paths)
@@ -79,7 +75,7 @@ Returns: Memory about GitHub token configuration and WSL setup
 
 **Behavior:**
 1. Preconditions: confirm Git branch and status; prefer Git as rollback (commit checkpoints per step)
-2. Memory-first: switch to project DB, run memory_find for cleanup/repo hygiene constraints
+2. Memory-first (if Neo4j MCP available): run search_memories for cleanup/repo hygiene constraints
 3. Audit (no changes): collect git status, diff, candidate new files; identify canonical locations (docs, scripts, temp)
 4. Produce a cleanup proposal: table with actions (KEEP/MOVE/MERGE/DELETE), reason, target, risk; verification plan; ask for "APPLY CLEANUP"
 5. Apply only after user types **APPLY CLEANUP**: consolidate scripts/docs, remove garbage, update .gitignore minimally
@@ -143,7 +139,7 @@ Commands are defined as Markdown files with:
 ## Integration with MCP
 
 Commands can use MCP tools:
-- `memory_store` / `memory_find` for Neo4j memory
+- `create_entities` / `search_memories` (user-memory MCP) for Neo4j memory
 - `github_*` for GitHub operations
 - `grafana_*` for metrics
 - Other MCP tools as needed

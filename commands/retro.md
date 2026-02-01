@@ -105,6 +105,8 @@ Use numeric prefixes for deterministic ordering and easy maintenance:
 - `200-<domain>.mdc`    (e.g., infra, data-import, security-hardening)
 - `900-ai-meta.mdc`     (meta: how to use rules/skills in THIS repo; keep tiny)
 
+Source of prefix convention: cursor-rules-principles.md (in repo or ~/.cursor) and this section. When proposing rule changes, you may refer to the maintain-project-rules skill or the rules-keeper agent (consistency audit).
+
 ## Rule activation modes (choose ONE per file)
 - alwaysApply: true  (no globs; minimal)
 - globs: ...         (scoped injection)

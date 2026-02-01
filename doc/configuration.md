@@ -11,6 +11,8 @@ All Cursor configuration files are located in `.cursor/`:
 - **`.cursor/cli-config.json`** - CLI permissions and editor settings
 - **`.cursor/commands/`** - Custom commands
 
+In this setup, skills and agents default to global locations: `~/.cursor/skills`, `~/.cursor/agents`; rules are project-only (`.cursor/rules/`).
+
 ## Environment Setup
 
 ### CURSOR_CONFIG_DIR
@@ -430,6 +432,24 @@ This sets all MCP environment variables in WSL (where MCPs actually run).
 - **No duplicates**: Global configs are minimized (empty `mcpServers`)
 - **All MCPs working**: All 6 MCPs should be active
 - **WSL accessible**: MCPs run via Docker (which runs in WSL)
+
+## Chat history migration (after renaming project)
+
+When Cursor runs on **Windows** and opens a WSL folder, chat history is stored in **Windows** (not in WSL):
+`%APPDATA%\Cursor\User\workspaceStorage\<workspaceId>\state.vscdb`.  
+(WSL `.cursor-server` only holds indexing; no `state.vscdb` there.) After renaming the repo (e.g. moltbot → openclow), the workspace path changes, so old chats stay in the previous workspace. There are also **two** openclow workspaces depending on how you open the project (WSL link vs direct repo path); the script merges into both.
+
+**If you migrated moltbot → openclow** and want the old agent/chat history:
+
+1. **Close Cursor** (so `state.vscdb` is not locked).
+2. From **WSL**, run (script uses Windows AppData via `/mnt/c/...`):
+   ```bash
+   python3 ~/.cursor/scripts/migrate-cursor-chats-moltbot-to-openclow.py
+   ```
+   The script merges chat data from moltbot into **both** openclow workspaces and creates a backup per target: `state.vscdb.backup_before_migrate` in each workspace folder.
+3. **Restart Cursor** and open the openclow project; merged chat history should appear in the agent panel.
+
+**Rollback:** with Cursor closed, copy `state.vscdb.backup_before_migrate` back to `state.vscdb` in the relevant workspace folder under `%APPDATA%\Cursor\User\workspaceStorage\`.
 
 ## Common Issues
 
