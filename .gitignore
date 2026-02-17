@@ -60,3 +60,9 @@ skills-cursor/
 
 # Test results (generated artifacts)
 test-results/
+
+# Quality gate hook state (local cache)
+hooks/.quality_gate_state.json
+
+# Quality gate hook state (cache)
+.cursor/hooks/.quality_gate_state.json
