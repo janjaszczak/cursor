@@ -1,9 +1,6 @@
 # >>> CURSOR MANAGED BLOCK >>>
 # Ignore everything in .cursor
 *
-# Plugin cache (rules, skills, agents)
-!plugins/
-!plugins/**
 # User's personal skills
 !skills/
 !skills/**
