@@ -38,6 +38,7 @@ GITHUB_PERSONAL_ACCESS_TOKEN=CHANGE_ME
 GRAFANA_URL=http://localhost:3001
 GRAFANA_API_KEY=CHANGE_ME
 POSTMAN_API_KEY=CHANGE_ME
+PERPLEXITY_API_KEY=CHANGE_ME
 "@
     $templateContent | Out-File -FilePath $envFile -Encoding UTF8
     Write-Host "[OK] Template created. Please edit .env and run script again." -ForegroundColor Green
@@ -72,7 +73,8 @@ $mcpVars = @(
     "GITHUB_PERSONAL_ACCESS_TOKEN",
     "GRAFANA_URL",
     "GRAFANA_API_KEY",
-    "POSTMAN_API_KEY"
+    "POSTMAN_API_KEY",
+    "PERPLEXITY_API_KEY"
 )
 
 Write-Host ""

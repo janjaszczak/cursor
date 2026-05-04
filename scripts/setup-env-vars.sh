@@ -33,6 +33,7 @@ GITHUB_PERSONAL_ACCESS_TOKEN=CHANGE_ME
 GRAFANA_URL=http://localhost:3001
 GRAFANA_API_KEY=CHANGE_ME
 POSTMAN_API_KEY=CHANGE_ME
+PERPLEXITY_API_KEY=CHANGE_ME
 ENVEOF
     echo "✓ Template created. Please edit .env and run script again."
     exit 0
@@ -62,6 +63,9 @@ fi
 if [ "$POSTMAN_API_KEY" = "CHANGE_ME" ] || [ -z "$POSTMAN_API_KEY" ]; then
     echo "⚠ POSTMAN_API_KEY is not set (CHANGE_ME or empty)"
 fi
+if [ "$PERPLEXITY_API_KEY" = "CHANGE_ME" ] || [ -z "$PERPLEXITY_API_KEY" ]; then
+    echo "⚠ PERPLEXITY_API_KEY is not set (CHANGE_ME or empty)"
+fi
 
 echo ""
 echo "Environment variables loaded from .env."
@@ -82,6 +86,7 @@ if [ "$EUID" -eq 0 ]; then
         echo "GRAFANA_URL=\"$GRAFANA_URL\""
         [ -n "$GRAFANA_API_KEY" ] && [ "$GRAFANA_API_KEY" != "CHANGE_ME" ] && echo "GRAFANA_API_KEY=\"$GRAFANA_API_KEY\""
         [ -n "$POSTMAN_API_KEY" ] && [ "$POSTMAN_API_KEY" != "CHANGE_ME" ] && echo "POSTMAN_API_KEY=\"$POSTMAN_API_KEY\""
+        [ -n "$PERPLEXITY_API_KEY" ] && [ "$PERPLEXITY_API_KEY" != "CHANGE_ME" ] && echo "PERPLEXITY_API_KEY=\"$PERPLEXITY_API_KEY\""
     } >> /etc/environment
     echo "✓ Appended to /etc/environment (system-wide)"
 else
@@ -114,15 +119,20 @@ try:
             break
     
     if start_idx is not None:
-        # Find end: next empty line after POSTMAN_API_KEY or end of file
+        # Find end: next empty line after last Cursor/MCP export (POSTMAN or PERPLEXITY) or end of file
         end_idx = len(lines)
-        found_postman = False
+        last_export_idx = None
         for i in range(start_idx + 1, len(lines)):
-            if re.match(r'^export POSTMAN_API_KEY', lines[i]):
-                found_postman = True
-            if found_postman and (lines[i].strip() == '' or i == len(lines) - 1):
-                end_idx = i + 1
-                break
+            if re.match(r'^export (POSTMAN_API_KEY|PERPLEXITY_API_KEY)', lines[i]):
+                last_export_idx = i
+        if last_export_idx is not None:
+            for i in range(last_export_idx + 1, len(lines)):
+                if lines[i].strip() == '':
+                    end_idx = i + 1
+                    break
+                if i == len(lines) - 1:
+                    end_idx = len(lines)
+                    break
         
         # Remove the section
         new_lines = lines[:start_idx] + lines[end_idx:]
@@ -163,6 +173,7 @@ PYEOF
             echo "export GRAFANA_URL=\"$GRAFANA_URL\""
             [ -n "$GRAFANA_API_KEY" ] && [ "$GRAFANA_API_KEY" != "CHANGE_ME" ] && echo "export GRAFANA_API_KEY=\"$GRAFANA_API_KEY\""
             [ -n "$POSTMAN_API_KEY" ] && [ "$POSTMAN_API_KEY" != "CHANGE_ME" ] && echo "export POSTMAN_API_KEY=\"$POSTMAN_API_KEY\""
+            [ -n "$PERPLEXITY_API_KEY" ] && [ "$PERPLEXITY_API_KEY" != "CHANGE_ME" ] && echo "export PERPLEXITY_API_KEY=\"$PERPLEXITY_API_KEY\""
         } >> "$file_path"
     }
     

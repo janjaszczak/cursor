@@ -54,6 +54,9 @@
         "--transport=stdio"
       ]
     },
+    "browseros": {
+      "url": "http://127.0.0.1:9000/mcp"
+    },
     "shrimp-task-manager": {
       "command": "docker",
       "args": [
@@ -105,6 +108,13 @@
         "mcp/postman",
         "--full",
         "--transport=stdio"
+      ]
+    },
+    "perplexity": {
+      "command": "bash",
+      "args": [
+        "-c",
+        "ROOT=\"${CURSOR_CONFIG_DIR:-$HOME/.cursor}\"; exec \"$ROOT/scripts/run-mcp-perplexity-docker.sh\""
       ]
     },
     "Apify": {

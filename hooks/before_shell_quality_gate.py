@@ -15,6 +15,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+import shlex
 import subprocess
 import sys
 from pathlib import Path
@@ -36,6 +37,22 @@ STATE_FILE = Path(__file__).resolve().parent / ".quality_gate_state.json"
 QUALITY_GATE_SCRIPT = "scripts/quality-gate.py"
 
 
+def _find_repo_with_quality_gate() -> Path | None:
+    """Walk up from cwd to find a directory that contains scripts/quality-gate.py."""
+    try:
+        p = Path.cwd().resolve()
+        for _ in range(20):
+            if (p / QUALITY_GATE_SCRIPT).is_file():
+                return p
+            parent = p.parent
+            if parent == p:
+                break
+            p = parent
+    except (OSError, RuntimeError):
+        pass
+    return None
+
+
 def _load_payload() -> dict:
     try:
         return json.load(sys.stdin)
@@ -49,11 +66,39 @@ def _is_gated(command: str) -> bool:
     return bool(GATED_RE.search(command))
 
 
+def _windows_to_wsl_path(win_path: str) -> Path:
+    """Convert Windows path to WSL path so Path.is_dir()/is_file() work when hook runs in WSL."""
+    s = (win_path or "").strip().replace("\\", "/")
+    # C:\Users\... or C:/Users/... -> /mnt/c/Users/...
+    m = re.match(r"^([a-zA-Z]):(.*)$", s)
+    if m:
+        drive = m.group(1).lower()
+        rest = m.group(2).lstrip("/")
+        return Path(f"/mnt/{drive}/{rest}")
+    # \\wsl.localhost\Ubuntu\mnt\c\... or similar
+    if s.lower().startswith("//wsl"):
+        parts = s.split("/")
+        try:
+            idx = parts.index("mnt")
+            if idx + 2 <= len(parts):
+                return Path("/" + "/".join(parts[idx:]))
+        except ValueError:
+            pass
+    return Path(s)
+
+
 def _repo_root(workspace_roots: list) -> Path | None:
     if not workspace_roots or not workspace_roots[0]:
         return None
-    root = Path(workspace_roots[0]).resolve()
-    return root if root.is_dir() else None
+    raw = workspace_roots[0]
+    root = Path(raw).resolve()
+    if root.is_dir():
+        return root
+    # Cursor may pass Windows path; hook runs in WSL
+    wsl = _windows_to_wsl_path(raw)
+    if wsl.is_dir():
+        return wsl
+    return None
 
 
 def _cache_key(root: Path) -> str | None:
@@ -109,8 +154,22 @@ def _save_state(root: Path, passed: bool, summary: str, cache_key: str | None) -
 
 
 def _detect_quality_commands(root: Path) -> list[str]:
-    """Return list of commands to run for quality (prefer fast lint/format + tests)."""
+    """Return list of commands to run for quality (prefer project script, then ruff/pytest)."""
     commands: list[str] = []
+
+    # Prefer project quality-gate script (works without ruff in PATH)
+    # Try root, cwd, then walk up from cwd – hook cwd may not be repo
+    bases: list[Path | None] = [root, Path.cwd()]
+    walk = _find_repo_with_quality_gate()
+    if walk:
+        bases.append(walk)
+    for base in bases:
+        if not base or not base.is_dir():
+            continue
+        custom = base / QUALITY_GATE_SCRIPT
+        if custom.is_file():
+            commands.append(f"{sys.executable} {shlex.quote(str(custom.resolve()))}")
+            return commands[:3]
 
     # package.json
     pkg = root / "package.json"
@@ -130,13 +189,12 @@ def _detect_quality_commands(root: Path) -> list[str]:
         except (json.JSONDecodeError, OSError):
             pass
 
-    # pyproject.toml (ruff, pytest)
+    # pyproject.toml (ruff, pytest) – only if no quality-gate.py (ruff may not be in PATH)
     pyproject = root / "pyproject.toml"
     if pyproject.is_file():
         try:
             content = pyproject.read_text(encoding="utf-8")
-            if "ruff" in content:
-                commands.append("ruff check .")
+            # Do NOT add "ruff check ." – ruff often not in PATH; use scripts/quality-gate.py
             if "pytest" in content or "[tool.pytest" in content:
                 commands.append("pytest -q --tb=no -x")
         except OSError:
@@ -159,24 +217,32 @@ def _detect_quality_commands(root: Path) -> list[str]:
 
 def _run_quality_gate(root: Path) -> tuple[bool, str]:
     """Run quality checks; return (passed, summary). Uses scripts/quality-gate.py (cross-platform)."""
-    custom = root / QUALITY_GATE_SCRIPT
-    if custom.is_file():
-        try:
-            r = subprocess.run(
-                [sys.executable, str(custom), str(root)],
-                cwd=root,
-                capture_output=True,
-                text=True,
-                timeout=120,
-            )
-            if r.returncode != 0:
-                stderr = (r.stderr or "").strip() or (r.stdout or "").strip()
-                return False, stderr[:500] if stderr else "scripts/quality-gate.py failed"
-            return True, "scripts/quality-gate.py OK"
-        except subprocess.TimeoutExpired:
-            return False, "Quality gate timed out (120s)"
-        except FileNotFoundError:
-            pass
+    # Try root, cwd, then walk up from cwd – hook cwd may not be repo
+    bases: list[Path | None] = [root, Path.cwd()]
+    walk = _find_repo_with_quality_gate()
+    if walk:
+        bases.append(walk)
+    for base in bases:
+        if not base or not base.is_dir():
+            continue
+        custom = base / QUALITY_GATE_SCRIPT
+        if custom.is_file():
+            try:
+                r = subprocess.run(
+                    [sys.executable, str(custom)],
+                    cwd=base,
+                    capture_output=True,
+                    text=True,
+                    timeout=120,
+                )
+                if r.returncode != 0:
+                    stderr = (r.stderr or "").strip() or (r.stdout or "").strip()
+                    return False, stderr[:500] if stderr else "scripts/quality-gate.py failed"
+                return True, "scripts/quality-gate.py OK"
+            except subprocess.TimeoutExpired:
+                return False, "Quality gate timed out (120s)"
+            except FileNotFoundError:
+                continue
 
     # Fallback: run detected stack commands
     commands = _detect_quality_commands(root)

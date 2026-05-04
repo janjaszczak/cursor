@@ -1,68 +1,19 @@
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-env/
-venv/
-ENV/
-.venv
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Temporary files
-*.tmp
-*.log
-temp/
-tmp/
-
-# Model files (large)
-*.bin
-*.safetensors
-*.pt
-*.pth
-*.ckpt
-*.h5
-*.pb
-
-# Data files
-*.csv
-*.parquet
-!package.json
-!tsconfig.json
-
-# Environment variables
-.env
-
-# Cursor IDE files (not tracked)
-ai-tracking/
-argv.json
-ide_state.json
-extensions/
-projects/
-browser-logs/
-plans/
-worktrees/
-skills-cursor/
-
-# Plans directory (optional - uncomment to ignore)
-# plans/
-
-# Test results (generated artifacts)
-test-results/
-
-# Quality gate hook state (local cache)
-hooks/.quality_gate_state.json
-
-# Quality gate hook state (cache)
-.cursor/hooks/.quality_gate_state.json
+# >>> CURSOR MANAGED BLOCK >>>
+# Ignore everything in .cursor
+*
+# Plugin cache (rules, skills, agents)
+!plugins/
+!plugins/**
+# User's personal skills
+!skills/
+!skills/**
+# User's personal slash commands
+!commands/
+!commands/**
+# Subagent state/transcripts
+!subagents/
+!subagents/**
+# User-level cursor rules
+!rules/
+!rules/**
+# <<< CURSOR MANAGED BLOCK <<<
