@@ -111,11 +111,16 @@
       ]
     },
     "perplexity": {
-      "command": "bash",
+      "command": "docker",
       "args": [
-        "-c",
-        "ROOT=\"${CURSOR_CONFIG_DIR:-$HOME/.cursor}\"; exec \"$ROOT/scripts/run-mcp-perplexity-docker.sh\""
-      ]
+        "run",
+        "-i",
+        "--rm",
+        "-e",
+        "PERPLEXITY_API_KEY",
+        "mcp/perplexity-ask"
+      ],
+      "envFile": "${userHome}/.cursor/.env"
     },
     "Apify": {
       "url": "https://mcp.apify.com",

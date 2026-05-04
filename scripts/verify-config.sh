@@ -67,6 +67,7 @@ required_vars=(
     "GRAFANA_URL"
     "GRAFANA_API_KEY"
     "POSTMAN_API_KEY"
+    "PERPLEXITY_API_KEY"
 )
 
 for var in "${required_vars[@]}"; do
@@ -91,7 +92,7 @@ if docker --version >/dev/null 2>&1; then
     echo "  ✓ Docker is available"
     
     # Check Docker images for MCP servers
-    mcp_images=("mcp/grafana" "mcp/playwright" "mcp/duckduckgo" "mcp/neo4j-memory" "mcp/github" "mcp/shrimp" "mcp/postman")
+    mcp_images=("mcp/grafana" "mcp/playwright" "mcp/duckduckgo" "mcp/neo4j-memory" "mcp/github" "mcp/shrimp" "mcp/postman" "mcp/perplexity-ask")
     for image in "${mcp_images[@]}"; do
         if docker images "$image" --format "{{.Repository}}:{{.Tag}}" 2>/dev/null | grep -q .; then
             echo "    ✓ Image exists: $image"

@@ -50,7 +50,7 @@ After setting, restart Cursor for changes to take effect.
 - `NEO4J_USERNAME`, `NEO4J_PASSWORD`, `NEO4J_DATABASE` - Neo4j auth (must be in Cursor’s environment).
 - `GITHUB_PERSONAL_ACCESS_TOKEN`, `GRAFANA_URL`, `GRAFANA_API_KEY`, `POSTMAN_API_KEY`, `PERPLEXITY_API_KEY` - As needed.
 
-**Perplexity MCP:** `mcp.json` starts `scripts/run-mcp-perplexity-docker.sh`, which **sources** `${CURSOR_CONFIG_DIR:-$HOME/.cursor}/.env` before `docker run`. That way the API key is available even when Cursor was launched from the GUI and does not inherit `~/.bashrc` / Windows User env. Keep `PERPLEXITY_API_KEY` in `.env` as today.
+**Perplexity MCP:** `mcp.json` sets `envFile` to `${userHome}/.cursor/.env` (see [Cursor MCP docs](https://cursor.com/docs/context/mcp)) so Cursor loads `PERPLEXITY_API_KEY` into the `docker` process before `docker run -e PERPLEXITY_API_KEY`. That works when Cursor was started from the GUI and does not inherit Windows User env or WSL `~/.bashrc`. Keep `PERPLEXITY_API_KEY` in `~/.cursor/.env`, then restart Cursor after editing.
 
 **When Cursor runs on Windows:**
 1. Edit `.env` in your `.cursor` folder (e.g. `C:\Users\<you>\.cursor\.env`).
