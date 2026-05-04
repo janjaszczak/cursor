@@ -55,6 +55,21 @@ else
     echo "  ✗ User .cursor directory does not exist"
 fi
 
+# Load ~/.cursor/.env so checks match what MCP wrapper scripts use (Cursor often
+# does not inherit interactive shell exports).
+echo ""
+echo "Loading MCP secrets from ~/.cursor/.env (if present)..."
+if [ -f "$HOME/.cursor/.env" ]; then
+    set -a
+    # shellcheck disable=1090
+    source "$HOME/.cursor/.env"
+    set +a
+    echo "  ✓ Sourced $HOME/.cursor/.env"
+else
+    warnings+=("~/.cursor/.env not found — MCP var checks use current shell only")
+    echo "  ⚠ $HOME/.cursor/.env not found"
+fi
+
 # Check environment variables
 echo ""
 echo "Checking MCP environment variables..."

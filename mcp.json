@@ -118,9 +118,9 @@
         "--rm",
         "-e",
         "PERPLEXITY_API_KEY",
-        "mcp/perplexity-ask"
-      ],
-      "envFile": "${userHome}/.cursor/.env"
+        "mcp/perplexity-ask",
+        "--transport=stdio"
+      ]
     },
     "Apify": {
       "url": "https://mcp.apify.com",
