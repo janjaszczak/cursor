@@ -14,3 +14,79 @@
 !rules/
 !rules/**
 # <<< CURSOR MANAGED BLOCK <<<
+
+# Dotfiles repo — versioned configuration (explicit allowlist)
+!/.gitignore
+!/README.md
+!/USER_RULES.txt
+!/.env.example
+!/mcp.json
+!/cli-config.json
+!/hooks.json
+!/agents/
+!/agents/**
+!/doc/
+!/doc/**
+!/scripts/
+!/scripts/**
+!/docker/
+!/docker/**
+!/hooks/
+!/hooks/**
+
+# Cursor runtime / cache / generated (never sync)
+projects/
+plugins/
+skills-cursor/
+plans/
+worktrees/
+extensions/
+ai-tracking/
+browser-logs/
+ide_state.json
+argv.json
+.cursor/
+
+# Environment and secrets
+.env
+.env.local
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+venv/
+.venv/
+env/
+ENV/
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary / logs
+*.tmp
+*.log
+temp/
+tmp/
+
+# Large model / data artifacts (accidental drops)
+*.bin
+*.safetensors
+*.pt
+*.pth
+*.ckpt
+*.h5
+*.pb
+*.csv
+*.parquet
+
+# Generated test / hook state
+test-results/
+hooks/.quality_gate_state.json
