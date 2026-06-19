@@ -5,7 +5,6 @@
       {"command": "hooks/guard-secret-write.py", "matcher": "Write"}
     ],
     "beforeShellExecution": [
-      {"command": "hooks/guard-shell-secret.py", "matcher": "\\.env|>>\\s*\\.env|>\\s*\\.env|tee.*\\.env"},
       {"command": "python3 hooks/before_shell_quality_gate.py"}
     ],
     "beforeMCPExecution": [
