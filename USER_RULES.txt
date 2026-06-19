@@ -48,6 +48,7 @@ SKILLS AVAILABLE (MCP integrations)
 mcp-memory-recall
 mcp-neo4j-memory-ops
 mcp-apify
+mcp-browseros
 mcp-browser-verify
 mcp-playwright
 mcp-github-ops
@@ -113,7 +114,12 @@ MCP skill activation
 - mcp-memory-recall: ONLY when the user references prior context (“as discussed”, “jak ostatnio”, recurring issue) or when continuity materially affects correctness.
 - mcp-neo4j-memory-ops: ONLY when writing/updating/merging memories (dedupe + relations).
 - mcp-github-ops: ONLY when PR/issue/review context or remote metadata is required.
-- mcp-browser-verify OR mcp-playwright (mutually exclusive): ONLY when UI/browser-flow verification is needed. Choose mcp-browser-verify for high-level verification; choose mcp-playwright for explicit Playwright-style automation. Do not activate both.
+- Browser MCP (pick ONE): mcp-browseros | mcp-playwright | mcp-browser-verify | cursor-ide-browser.
+  - mcp-browseros: visible user BrowserOS, CAPTCHA/2FA/manual intervention, anti-bot in user session, OAuth/cookies, Klavis Strata integrations.
+  - mcp-playwright: isolated Playwright E2E, repeatable smoke tests.
+  - mcp-browser-verify: generic UI verification when no specific tool is required.
+  - cursor-ide-browser: quick in-IDE webview verification without leaving Cursor.
+  Do not activate more than one browser MCP skill per task.
 - mcp-grafana: ONLY for observability/incident context and regression analysis.
 - mcp-postman: ONLY for API workflow/collections/tests as the source of truth.
 - mcp-apify: ONLY for scraping/data acquisition pipelines.
