@@ -8,7 +8,7 @@ Custom commands are user-defined shortcuts that extend Cursor's functionality. T
 
 ## Available Commands
 
-Four custom commands are defined: `/save_memory`, `/recall_memory`, `/cleanup`, `/retro`.
+Six custom commands are defined: `/save_memory`, `/recall_memory`, `/cleanup`, `/retro`, `/status`, `/next`.
 
 ### `/save_memory`
 
@@ -104,6 +104,48 @@ Returns: Memory about GitHub token configuration and WSL setup
 **Output:** Snapshot, issues with evidence, compliance audit, proposed improvements per group, selection checklist; after APPLY, completion summary.
 
 **Note:** Uses Shrimp tasks if available; otherwise same sections as headings. See [commands/retro.md](../commands/retro.md) for full spec.
+
+### `/status`
+
+**Purpose:** Read-only project status snapshot and recommendation for the next task (no edits, no mode switch, no execution).
+
+**Usage:**
+```
+/status
+```
+
+**Behavior:**
+1. Capability check (Shrimp, memory MCP, git, optional GitHub/CI)
+2. Collect: Shrimp tasks (`in_progress` / `pending`), git status, memory search, light repo/CI signals
+3. Recommend next task with suggested mode (PLAN | DEBUG | ASK | MULTITASK | AGENT) and skills
+4. Stop without making changes
+
+**Output:** Structured snapshot + recommended next task + blockers.
+
+See [commands/status.md](../commands/status.md) for full spec.
+
+### `/next`
+
+**Purpose:** Check status, pick the next task, switch to the appropriate working mode, and **start execution**.
+
+**Usage:**
+```
+/next
+/next plan          # force PLAN mode
+/next debug         # force DEBUG mode
+/next status only   # status block only (same as /status)
+```
+
+**Behavior:**
+1. Run `/status` evidence collection (short summary)
+2. Pick next task (Shrimp `in_progress` → pending → git WIP → memory → issues)
+3. Route to mode: PLAN (SwitchMode + plan-as-contract), DEBUG (RCA), ASK (read-only), MULTITASK (parallel subagents), or AGENT (default implement)
+4. Execute: Shrimp `execute_task` loop or direct implementation with minimal skills
+5. Ambiguity → ask user to pick; PLAN → wait for approval unless "just do it"
+
+**Output:** Status line + chosen task + mode + immediate first action.
+
+See [commands/next.md](../commands/next.md) for full spec.
 
 ## Command Structure
 

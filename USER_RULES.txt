@@ -83,7 +83,7 @@ Process / risk / delivery skills
 - repo-grounding: ONLY if the task requires repo truth (code/config/docs changes, “where is X implemented?”, debugging this repo).
 - cross-platform-safety: ONLY if commands/paths/permissions differ across Windows vs WSL vs Docker/PowerShell vs bash.
 - troubleshooting-rca: ONLY for bugs/errors/regressions/logs (“doesn’t work”, stack traces, failing tests).
-- task-planning-shrimp: ONLY for multi-step/multi-file/long refactors where persistent task tracking is useful.
+- task-planning-shrimp: ONLY when work continues across sessions AND backlog has multiple tasks with explicit dependencies; NOT for same-session planning (use Plan Mode). Shrimp volume is global (one backlog all projects).
 - plan-as-contract: ONLY for risky ops, architecture changes, migrations, multi-file edits that benefit from a reviewable plan before execution.
 - high-risk-review: ONLY for security/infra/data-loss/performance-critical changes or when uncertainty is material.
 - deep-research: ONLY for niche/time-sensitive topics or when surveying external best practices is required (especially for architecture/security/perf decisions).
@@ -141,7 +141,7 @@ Max CoVe iterations (hard cap 5; stop early if uncertainty is eliminated)
 
 PLANNING TOOLING (avoid duplication)
 - Use Cursor Plan Mode for interactive, session-bounded planning.
-- Use Shrimp (task-planning-shrimp / mcp-shrimp-execution-loop) for persistent multi-step tracking across long runs/token limits.
+- Use Shrimp (task-planning-shrimp / mcp-shrimp-execution-loop) only for cross-session operational backlog with dependency graph; use Plan Mode for interactive same-session planning.
 - CoVe validates the plan regardless of whether Plan Mode or Shrimp produced it.
 - When creating a plan (CreatePlan / Plan Mode), always add an explicit to-do list in the plan body (checkboxes) and in frontmatter `todos` if the format supports it, so the user does not have to ask for it separately.
 
