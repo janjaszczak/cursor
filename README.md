@@ -23,7 +23,10 @@ All documentation is in the **[doc/](doc/)** directory:
 
 ```
 ~/.cursor/                # User Cursor configuration (single source of truth)
-├── rules/                # Project rules and conventions
+├── USER_RULES.txt        # Global rules → Settings → User Rules (all projects)
+├── AGENTS.default.md     # Global AGENTS fallback when repo has no AGENTS.md
+├── agents/               # Subagents (per user, all projects)
+├── .cursorignore         # Indexing exclusions for this workspace
 ├── mcp.json              # MCP server configurations
 ├── cli-config.json        # CLI permissions
 ├── commands/             # Custom commands

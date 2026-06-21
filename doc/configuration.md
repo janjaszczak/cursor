@@ -11,7 +11,33 @@ All Cursor configuration files are located in `.cursor/`:
 - **`.cursor/cli-config.json`** - CLI permissions and editor settings
 - **`.cursor/commands/`** - Custom commands
 
-In this setup, skills and agents default to global locations: `~/.cursor/skills`, `~/.cursor/agents`; rules are project-only (`.cursor/rules/`).
+In this setup, skills and agents default to global locations: `~/.cursor/skills`, `~/.cursor/agents`.
+
+**Global rules:** [`USER_RULES.txt`](USER_RULES.txt) → sync to **Cursor Settings → Rules → User Rules** (Always Apply). This is the only mechanism that applies to all projects. See [doc/rules.md](rules.md).
+
+**Per-project rules:** `<repo>/.cursor/rules/*.mdc` for stack-specific conventions only.
+
+## Agentic loop assets
+
+| Asset | Location | Scope |
+|-------|----------|-------|
+| Global router, loop, CoVe | `USER_RULES.txt` → Settings User Rules | **All projects (per user)** |
+| Global AGENTS fallback | `AGENTS.default.md` + User Rules read instruction | **All projects (per user)** |
+| Subagents | `~/.cursor/agents/` | **All projects (per user)** |
+| Cursor auto-inject AGENTS | `<repo>/AGENTS.md` | Per repo — use `scripts/bootstrap-agents-md.py` |
+| Stack conventions | `<repo>/.cursor/rules/*.mdc` | One repo |
+| Quality gate | `scripts/quality-gate.py` | Hooks + CI |
+| Grind hook | `hooks/grind_until_verify.py` | Agent stop loop |
+
+## Model selection (agent loops)
+
+| Task type | Model | Notes |
+|-----------|-------|-------|
+| Plan / architecture / security review | Thinking (e.g. Claude Sonnet thinking) | `/next` PLAN mode, plan-as-contract |
+| Implement / fix / run tests | Fast (e.g. Composer 2 Fast) | Default in `cli-config.json` |
+| Verify / audit | Thinking | Subagent `verifier` |
+
+CLI default: see `cli-config.json` → `model.modelId`. Change via Cursor model picker or CLI; restart CLI after editing config.
 
 ## Environment Setup
 

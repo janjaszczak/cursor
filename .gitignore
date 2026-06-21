@@ -48,14 +48,19 @@ projects/*/*
 !/.gitignore
 !/README.md
 !/USER_RULES.txt
+!/AGENTS.default.md
 !/.env.example
 !/mcp.json
 !/cli-config.json
 !/hooks.json
+!/doc/CONFIG_REPO.md
+!/.cursorignore
 !/agents/
 !/agents/**
 !/doc/
 !/doc/**
+!/doc/templates/
+!/doc/templates/**
 !/scripts/
 !/scripts/**
 !/docker/
@@ -119,3 +124,4 @@ tmp/
 # Generated test / hook state
 test-results/
 hooks/.quality_gate_state.json
+hooks/.grind_verify_state.json

@@ -1,73 +1,80 @@
 # Cursor Agent Hooks
 
-This document describes how Cursor Agent Hooks are used in this setup to enforce authorization for secret writes.
-
-## Overview
-
-Hooks let you observe, control, and extend the agent loop using scripts. They run before or after defined stages (tool use, shell execution, MCP execution, file edit, etc.) and receive JSON via stdin and return JSON via stdout.
+Hooks observe, control, and extend the agent loop. Scripts receive JSON on stdin and return JSON on stdout.
 
 **Official reference:** [Cursor Hooks](https://cursor.com/docs/agent/hooks)
 
-## Configuration Location
+## Configuration
 
-- **User-level (global):** `~/.cursor/hooks.json` — scripts run from `~/.cursor/`, use paths like `./hooks/guard-secret-write.py`. Copy or symlink from this repo: `hooks.json` → `~/.cursor/hooks.json`, `hooks/` → `~/.cursor/hooks/`, and set paths in the JSON to `./hooks/...`.
-- **Project-level (this repo):** `.cursor/hooks.json` — scripts run from project root; paths in JSON are `.cursor/hooks/guard-secret-write.py` etc. When this repo is the workspace, Cursor loads these hooks.
+- **User-level:** `~/.cursor/hooks.json` — scripts run from `~/.cursor/`; paths like `hooks/guard-secret-write.py`.
+- **Project-level:** `<repo>/.cursor/hooks.json` — paths relative to project root.
 
-## Policy in This Setup
+Active config: [`hooks.json`](../hooks.json) at repo root (same as user `~/.cursor` when this is the config source of truth).
 
-- **Do not** block reading files that contain secrets (e.g. `.env`, `*.kdbx`). The agent may use secrets when the user asks.
-- **Require user authorization** when the agent tries to **write** secrets (e.g. creating or editing `.env`, persisting credentials to files). Operations that persist secrets outside the IDE’s ephemeral context must be explicitly approved.
+## Policy
 
-## Hooks in Use
+- **Read** secrets (`.env`, `*.kdbx`) — allowed when user requests.
+- **Write** secrets to disk — requires approval (`guard-secret-write.py`).
+- **Commit/push/PR/publish** — quality gate must pass (`before_shell_quality_gate.py`).
+- **MCP writes** — ask user (`guard-mcp-write.py`).
+- **Stop** — follow-up when verify/quality gate failed (grind loop up to 5 iterations).
 
-| Hook | Purpose | Script |
-|------|---------|--------|
-| **preToolUse** (matcher: `Write`) | Before any file write: if the target path is sensitive (e.g. `.env`, `*.pem`) and the content looks like secrets (password=, api_key=, etc.), return `decision: "deny"` or prompt for user approval | `guard-secret-write.py` |
-| **beforeShellExecution** (matcher: commands writing to `.env`) | Before shell commands that write to `.env` or similar: return `permission: "ask"` so the user must approve | `guard-shell-secret.py` |
-| **beforeMCPExecution** | Before MCP tools that write (e.g. memory_store, GitHub write, Shrimp update): return `permission: "ask"` with a short description | `guard-mcp-write.py` |
+## Hooks in use
 
-## Hook Script Requirements
+| Hook | Script | Purpose |
+|------|--------|---------|
+| **preToolUse** (matcher: `Write`) | `hooks/guard-secret-write.py` | Block or deny writes to sensitive paths with secret-like content |
+| **beforeShellExecution** | `hooks/before_shell_quality_gate.py` | Run quality checks before `git commit`, `git push`, `gh pr create/merge`, `npm/pnpm/yarn publish` |
+| **beforeMCPExecution** | `hooks/guard-mcp-write.py` | `permission: ask` for MCP tools that write (memory, GitHub, Shrimp, etc.) |
+| **stop** | `hooks/stop_quality_gate_followup.py` | Remind agent if last quality gate = FAIL |
+| **stop** | `hooks/grind_until_verify.py` | Continue loop with `followup_message` until verify passes or max 5 iterations |
 
-- **Input:** JSON on stdin (structure depends on the hook; see Cursor docs).
-- **Output:** JSON on stdout. Examples:
-  - preToolUse: `{"decision": "allow"}` or `{"decision": "deny", "reason": "..."}` (or ask variant if supported).
-  - beforeShellExecution / beforeMCPExecution: `{"permission": "allow"}` or `{"permission": "ask", "user_message": "...", "agent_message": "..."}` or `{"permission": "deny", ...}`.
-- **Exit code:** `0` for allow/ask; `2` for deny (blocks the action).
-- **Fail-closed:** For beforeMCPExecution, if the script crashes or times out, Cursor blocks the MCP call.
+State files (gitignored): `hooks/.quality_gate_state.json`, `hooks/.grind_verify_state.json`.
 
-## Example hooks.json (user-level)
+## Hook I/O
+
+- **preToolUse:** `{"decision": "allow"}` or `{"decision": "deny", "reason": "..."}`
+- **beforeShellExecution / beforeMCPExecution:** `{"permission": "allow"|"ask"|"deny", ...}`
+- **stop:** `{}` or `{"followup_message": "..."}`
+- Exit code `2` = deny (where applicable). MCP hook fail-closed on crash.
+
+## Example hooks.json
 
 ```json
 {
   "version": 1,
   "hooks": {
     "preToolUse": [
-      {
-        "command": "./hooks/guard-secret-write.py",
-        "matcher": "Write"
-      }
+      {"command": "hooks/guard-secret-write.py", "matcher": "Write"}
     ],
     "beforeShellExecution": [
-      {
-        "command": "./hooks/guard-shell-secret.py",
-        "matcher": "\\.env|>>\\s*\\.env|>\\s*\\.env|tee.*\\.env"
-      }
+      {"command": "python3 hooks/before_shell_quality_gate.py"}
     ],
     "beforeMCPExecution": [
-      {
-        "command": "./hooks/guard-mcp-write.py"
-      }
+      {"command": "hooks/guard-mcp-write.py"}
+    ],
+    "stop": [
+      {"command": "python3 hooks/stop_quality_gate_followup.py"},
+      {"command": "python3 hooks/grind_until_verify.py"}
     ]
   }
 }
 ```
 
-For project-level hooks, use `.cursor/hooks/guard-secret-write.py` etc. and ensure scripts are executable.
+On Windows without `python3` in PATH, use `python` in `hooks.json`.
+
+## Quality gate
+
+See [quality-gate.md](quality-gate.md). Per-repo checks live in `scripts/quality-gate.py` in each project (including this config repo).
 
 ## Verification
 
-After enabling hooks:
+```bash
+python scripts/test-quality-gate-hook.py
+```
 
-1. **Write to .env:** Ask the agent to create or edit a `.env` file with a secret — the hook should trigger and ask for approval (or deny).
-2. **Read .env:** Ask the agent to read `.env` — no block; reading is allowed.
-3. **MCP write:** Trigger an MCP tool that writes (e.g. memory store) — hook should ask for approval.
+Manual checks:
+
+1. Edit `.env` with agent → secret write hook triggers.
+2. `git commit` with failing lint → beforeShellExecution deny.
+3. After failed verify in agent session → stop hook returns grind followup (max 5).

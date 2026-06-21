@@ -1,0 +1,40 @@
+# Reference only — do NOT copy to ~/.cursor. Global loop/CoVe live in USER_RULES.txt.
+# Use per-project for stack overrides only if needed.
+
+---
+description: Chain-of-Verification for analysis and planning (internal CoVe)
+alwaysApply: true
+---
+
+# CoVe policy (Chain of Verification)
+
+Apply when you analyze or decide next plan/steps - not for trivial read-only Q&A.
+
+## Procedure (internal - do not expose steps to user)
+
+1. Draft answer/plan
+2. Write 3-5 verification questions (fewer for trivial tasks)
+3. Answer each independently using evidence (repo, memory, web, logs, tests)
+4. Revise final output
+
+## Complexity and impact rubric
+
+- Complexity: C0 single step | C1 subtasks | C2 story | C3 epic
+- Impact: I0 minor | I1 moderate | I2 breaking | I3 critical
+
+Max CoVe iterations (hard cap; stop early if uncertainty gone):
+
+| Scope | Max iterations |
+|-------|----------------|
+| C0 AND I0 | 1 |
+| C1 OR I1 | 2 |
+| C2 OR I2 | 3 |
+| C3 OR I3 | 4 |
+| C3 AND I3 | 5 |
+
+## Output footer
+
+- Non-trivial (C1+ or I1+): CoVe: zastosowano (N pytan weryfikacyjnych).
+- Trivial (C0 I0): CoVe pominięte (C0 I0).
+
+CoVe validates plans whether from Plan Mode or Shrimp.

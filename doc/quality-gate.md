@@ -24,6 +24,13 @@ Hook **stop** wywołuje `python3 hooks/stop_quality_gate_followup.py`. Jeśli os
 ## Checki jakości (cross-platform: Windows + WSL)
 
 1. **scripts/quality-gate.py** — Python 3, działa na Windows i WSL. Hook uruchamia go jako `python scripts/quality-gate.py <repo_root>`.
+
+**W repo ~/.cursor (config):** gate sprawdza m.in. poprawność JSON, `py_compile` hooków, **`USER_RULES.txt`** (sekcje AGENTIC LOOP, COVE, SKILL CATALOG).
+
+**Globalne reguły** nie są w `.mdc` — tylko w `USER_RULES.txt` → Settings → User Rules. Zobacz [rules.md](rules.md).
+
+**W projektach aplikacyjnych:** rozszerz `run_checks()` o lint, typecheck, test — wzoruj się na [`doc/templates/AGENTS.md`](templates/AGENTS.md).
+
 2. Gdy nie ma tego skryptu → hook wykrywa stack po plikach:
    - **package.json** → `npm run lint` / `npm run format` / `npm run test` (pierwszy znaleziony);
    - **pyproject.toml** → `ruff check .`, `pytest -q --tb=no -x`;

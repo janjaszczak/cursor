@@ -34,7 +34,7 @@ def main() -> int:
 
     if not gated_only:
         # 1) Non-gated → allow
-        print("Test 1: non-gated command (git status) → expect permission: allow")
+        print("Test 1: non-gated command (git status) -> expect permission: allow")
         result = run_hook("git status")
         perm = result.get("permission", result.get("_raw", "?"))
         if perm == "allow":
@@ -44,7 +44,7 @@ def main() -> int:
             failed += 1
 
     # 2) Gated → run gate, then allow or deny
-    print("\nTest 2: gated command (git commit -m test) → run gate")
+    print("\nTest 2: gated command (git commit -m test) -> run gate")
     result = run_hook("git commit -m test")
     perm = result.get("permission", result.get("_raw", "?"))
     if perm in ("allow", "deny"):
@@ -71,6 +71,51 @@ def main() -> int:
         print("  OK: output =", stop_result)
     except json.JSONDecodeError:
         print("  output (raw):", out)
+
+    # 4) Grind hook with simulated fail state
+    print("\nTest 4: grind_until_verify.py (simulated verify fail)")
+    grind_state = REPO_ROOT / "hooks" / ".grind_verify_state.json"
+    grind_state.write_text(
+        json.dumps({"active": True, "iteration": 1, "last_detail": "pytest failed"}),
+        encoding="utf-8",
+    )
+    grind_script = REPO_ROOT / "hooks" / "grind_until_verify.py"
+    r = subprocess.run(
+        [sys.executable, str(grind_script)],
+        input="{}",
+        capture_output=True,
+        text=True,
+        cwd=REPO_ROOT,
+        timeout=5,
+    )
+    out = (r.stdout or "").strip()
+    try:
+        grind_result = json.loads(out) if out else {}
+        if grind_result.get("followup_message"):
+            print("  OK: followup_message present")
+        else:
+            print("  WARN:", grind_result)
+    except json.JSONDecodeError:
+        print("  output (raw):", out)
+    finally:
+        if grind_state.is_file():
+            grind_state.unlink()
+
+    # 5) Quality gate script
+    print("\nTest 5: scripts/quality-gate.py")
+    qg = REPO_ROOT / "scripts" / "quality-gate.py"
+    r = subprocess.run(
+        [sys.executable, str(qg), str(REPO_ROOT)],
+        capture_output=True,
+        text=True,
+        cwd=REPO_ROOT,
+        timeout=60,
+    )
+    if r.returncode == 0:
+        print("  OK:", (r.stdout or "").strip()[:120])
+    else:
+        print("  FAIL:", (r.stderr or r.stdout or "").strip()[:200])
+        failed += 1
 
     print("\n" + ("Some tests failed." if failed else "All tests passed."))
     return 1 if failed else 0

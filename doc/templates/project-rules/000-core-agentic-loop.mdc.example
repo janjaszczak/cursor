@@ -1,0 +1,41 @@
+# Reference only — do NOT copy to ~/.cursor. Global loop/CoVe live in USER_RULES.txt.
+# Use per-project for stack overrides only if needed.
+
+---
+description: Agentic loop Definition of Done, verify-first, revert over iterate
+alwaysApply: true
+---
+
+# Agentic loop (Observe -> Act -> Verify -> Decide -> Repeat)
+
+Applies when implementing or fixing code. Read project AGENTS.md for repo-specific verify commands.
+
+## Definition of Done - task is done when ALL are true
+
+1. Acceptance criteria from plan/task/AGENTS.md are met (cite which).
+2. Verification command exits 0 (name the exact command run).
+3. No new linter/type errors in touched files.
+4. Shrimp verify_task score >=80 OR verifier pass OR explicit user sign-off.
+
+Even C0 fix tasks require a one-line verify (lint or targeted test) before marking done.
+
+## Verify-first
+
+Before first edit: state verify command(s) from AGENTS.md or scripts/quality-gate.py.
+
+After changes: run verify; if FAIL, fix and re-run (max 5 iterations, then STOP and report blocker).
+
+## Revert over iterate
+
+If the agent diverges from an approved plan: revert, refine plan, re-run - do not patch via many follow-up prompts.
+
+## Stop conditions
+
+- 3 identical verify failures or no file diff after 2 fix attempts -> STOP + blocker report.
+- Destructive ops: rollback plan + user confirmation first.
+- Shrimp continuous mode: stop on verify <80, ambiguity, or out-of-scope blocker.
+
+## Model selection
+
+- Plan / architecture / security review -> thinking model.
+- Implement / fix / run tests -> fast model.

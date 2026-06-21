@@ -11,7 +11,8 @@
       {"command": "hooks/guard-mcp-write.py"}
     ],
     "stop": [
-      {"command": "python3 hooks/stop_quality_gate_followup.py"}
+      {"command": "python3 hooks/stop_quality_gate_followup.py"},
+      {"command": "python3 hooks/grind_until_verify.py"}
     ]
   }
 }

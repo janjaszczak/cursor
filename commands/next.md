@@ -53,10 +53,13 @@ If next task has a Shrimp `taskId`:
 4. On completion: `verify_task` + `update_task` status
 
 ### 4.2 Non-Shrimp task
-1. Activate the primary domain skill (repo-grounding first if touching this repo)
-2. State acceptance criteria in 1–3 bullets
-3. Execute minimal first step immediately (read files, run failing test, reproduce bug — **do not** stop at "you should…")
-4. Run verification when a fix/change is in scope
+1. Resolve AGENTS: read `<repo-root>/AGENTS.md` if present; else read `~/.cursor/AGENTS.default.md`.
+2. If neither exists, warn and offer `python ~/.cursor/scripts/bootstrap-agents-md.py`.
+3. Activate the primary domain skill (repo-grounding first if touching this repo)
+4. State acceptance criteria in 1–3 bullets **and name verify command(s)** before the first file edit
+5. When scope is known: use `@Branch` and tag at most 3 key files; otherwise let agent search
+6. Execute minimal first step immediately (read files, run failing test, reproduce bug — **do not** stop at "you should…")
+7. Run verification when a fix/change is in scope
 
 ### 4.3 Skills activation (minimum set)
 Follow USER_RULES skill selection policy:

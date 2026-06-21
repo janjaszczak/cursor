@@ -1,7 +1,33 @@
 {
   "permissions": {
-    "allow": [],
-    "deny": []
+    "allow": [
+      "Shell(git status)",
+      "Shell(git diff*)",
+      "Shell(git log*)",
+      "Shell(git branch*)",
+      "Shell(ls*)",
+      "Shell(dir*)",
+      "Shell(cat*)",
+      "Shell(Get-Content*)",
+      "Shell(python*)",
+      "Shell(pytest*)",
+      "Shell(npm run test*)",
+      "Shell(npm run lint*)",
+      "Shell(npm run check*)",
+      "Shell(npm run build*)",
+      "Shell(gh pr view*)",
+      "Shell(gh issue list*)"
+    ],
+    "deny": [
+      "Shell(git push*)",
+      "Shell(git push --force*)",
+      "Shell(rm -rf*)",
+      "Shell(docker rm*)",
+      "Shell(docker system prune*)",
+      "Shell(npm publish*)",
+      "Shell(pnpm publish*)",
+      "Shell(yarn publish*)"
+    ]
   },
   "version": 1,
   "editor": {
@@ -43,7 +69,7 @@
   "network": {
     "useHttp1ForAgent": false
   },
-  "approvalMode": "unrestricted",
+  "approvalMode": "allowlist",
   "sandbox": {
     "mode": "disabled"
   },

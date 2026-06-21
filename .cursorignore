@@ -1,0 +1,14 @@
+﻿# Cursor config repo — reduce noise in @codebase / indexing
+projects/
+plugins/cache/
+ai-tracking/
+browser-logs/
+test-results/
+extensions/
+worktrees/
+.cursor/
+*.log
+hooks/.quality_gate_state.json
+hooks/.grind_verify_state.json
+.env
+.env.local
