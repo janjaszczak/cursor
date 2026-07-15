@@ -8,7 +8,7 @@ Custom commands are user-defined shortcuts that extend Cursor's functionality. T
 
 ## Available Commands
 
-Six custom commands are defined: `/save_memory`, `/recall_memory`, `/cleanup`, `/retro`, `/status`, `/next`.
+Seven custom commands are defined: `/save_memory`, `/recall_memory`, `/cleanup`, `/retro`, `/status`, `/next`, `/ponytail_review`.
 
 ### `/save_memory`
 
@@ -146,6 +146,37 @@ See [commands/status.md](../commands/status.md) for full spec.
 **Output:** Status line + chosen task + mode + immediate first action.
 
 See [commands/next.md](../commands/next.md) for full spec.
+
+### `/ponytail_review`
+
+**Purpose:** Review a diff or the whole repo for over-engineering (unnecessary
+abstractions, unused dependencies, dead code) using the "laziness ladder" from
+[DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail); never flags
+validation/error-handling/security/accessibility code.
+
+**Usage:**
+```
+/ponytail_review          # diff mode (git diff / current PR)
+/ponytail_review repo     # full-repo audit
+/ponytail_review debt     # scan for deferred "native for now" shortcuts
+```
+
+**Behavior:**
+1. Scope: diff, repo, or debt-ledger scan (see above).
+2. Apply the ladder as a filter: YAGNI → reuse → stdlib → native feature → installed
+   dependency → one-liner → minimum that works.
+3. Never flag anything load-bearing for correctness (validation, error handling,
+   security, accessibility), even if it adds lines.
+4. Report a delete-list (file:line, issue, suggested fix) + one-line verdict.
+5. Apply deletions only after user confirmation, or when already inside
+   `/cleanup` + **APPLY CLEANUP**.
+
+**Output:** Findings table, verdict, optional debt table.
+
+**Note:** The always-on half of ponytail (the ladder itself, applied while writing new
+code) lives in `USER_RULES.txt` → STATIC PRINCIPLES; this command is the on-demand
+review/audit half. See [commands/ponytail_review.md](../commands/ponytail_review.md)
+and skill [skills/ponytail/SKILL.md](../skills/ponytail/SKILL.md) for full spec.
 
 ## Command Structure
 
