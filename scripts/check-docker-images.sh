@@ -89,7 +89,7 @@ if [ ${#missing_images[@]} -gt 0 ]; then
     echo "Images requiring Dockerfile:"
     for name in "${missing_images[@]}"; do
         echo "  - $name"
-    fi
+    done
 fi
 
 # Export results to JSON
