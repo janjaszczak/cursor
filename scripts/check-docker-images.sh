@@ -16,6 +16,7 @@ declare -a servers=(
     "github:mcp/github:"
     "playwright:mcp/playwright:"
     "duckduckgo:mcp/duckduckgo:"
+    "searxng:isokoliuk/mcp-searxng:"
     "memory:mcp/neo4j-memory:"
     "shrimp:mcp/shrimp:"
     "postman:mcp/postman:"

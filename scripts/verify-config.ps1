@@ -107,7 +107,7 @@ try {
         Write-Host "  [OK] Docker is available" -ForegroundColor Green
         
         # Check Docker images for MCP servers
-        $mcpImages = @("mcp/grafana", "mcp/playwright", "mcp/duckduckgo", "mcp/neo4j-memory", "mcp/github", "mcp/shrimp", "mcp/postman", "mcp/perplexity-ask")
+        $mcpImages = @("mcp/grafana", "mcp/playwright", "mcp/duckduckgo", "isokoliuk/mcp-searxng", "mcp/neo4j-memory", "mcp/github", "mcp/shrimp", "mcp/postman", "mcp/perplexity-ask")
         foreach ($image in $mcpImages) {
             $imageCheck = docker images $image --format "{{.Repository}}:{{.Tag}}" 2>&1
             if ($LASTEXITCODE -eq 0 -and $imageCheck) {

@@ -1,0 +1,48 @@
+# SearXNG settings for the local "searxng" engine container used by the
+# "searxng" MCP server entry in mcp.json (via the isokoliuk/mcp-searxng wrapper).
+#
+# This instance is for internal/agent use only (bound to 127.0.0.1 and the
+# mcp-network Docker network by scripts/start-searxng.sh) — it is never
+# exposed to the public internet, so the bot/rate limiter is disabled and
+# a fixed local secret_key is acceptable.
+#
+# Reference: https://docs.searxng.org/admin/settings/settings.html
+
+use_default_settings: true
+
+general:
+  debug: false
+  instance_name: "cursor-mcp-searxng"
+
+search:
+  safe_search: 0
+  autocomplete: ""
+  # json is required for the MCP wrapper's API calls; without it SearXNG
+  # returns 403 for format=json requests.
+  formats:
+    - html
+    - json
+
+server:
+  # Overwritten at container start by scripts/start-searxng.sh via -e SEARXNG_SECRET
+  # (auto-generated if not already set in your environment/.env).
+  secret_key: "${SEARXNG_SECRET}"
+  # Safe to disable: this instance is never reachable from the public internet.
+  limiter: false
+  image_proxy: true
+  port: 8080
+  bind_address: "0.0.0.0"
+
+# Keep the engine list small and privacy-respecting; add engines here if you
+# need broader coverage (see https://docs.searxng.org/user/configured_engines.html).
+engines:
+  - name: google
+    disabled: false
+  - name: bing
+    disabled: false
+  - name: brave
+    disabled: false
+  - name: duckduckgo
+    disabled: false
+  - name: wikipedia
+    disabled: false

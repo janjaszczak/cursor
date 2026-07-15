@@ -107,7 +107,7 @@ if docker --version >/dev/null 2>&1; then
     echo "  ✓ Docker is available"
     
     # Check Docker images for MCP servers
-    mcp_images=("mcp/grafana" "mcp/playwright" "mcp/duckduckgo" "mcp/neo4j-memory" "mcp/github" "mcp/shrimp" "mcp/postman" "mcp/perplexity-ask")
+    mcp_images=("mcp/grafana" "mcp/playwright" "mcp/duckduckgo" "isokoliuk/mcp-searxng" "mcp/neo4j-memory" "mcp/github" "mcp/shrimp" "mcp/postman" "mcp/perplexity-ask")
     for image in "${mcp_images[@]}"; do
         if docker images "$image" --format "{{.Repository}}:{{.Tag}}" 2>/dev/null | grep -q .; then
             echo "    ✓ Image exists: $image"
