@@ -54,25 +54,34 @@ All documentation is in the **[doc/](doc/)** directory:
 
 ## MCP Servers
 
-This configuration includes:
+This configuration includes 11 servers. Free/self-hosted (no per-request cost) are preferred as defaults; paid APIs are kept as explicit escalation paths:
+
+**Free / self-hosted (default tools):**
 - **memory** (Neo4j) - Persistent knowledge storage
 - **playwright** - Browser automation
-- **duckduckgo** - Web search
+- **duckduckgo** - Web search (keyless)
+- **searxng** - Web search, aggregated engines (self-hosted, see [docker/mcp-searxng](docker/mcp-searxng/README.md)) — preferred over duckduckgo for routine search
 - **github** - GitHub repository operations
 - **grafana** - Metrics and dashboards
+- **browseros** - Visible browser automation (user's own Chromium profile)
 - **shrimp-task-manager** - Task planning and execution
 
-See [doc/configuration.md](doc/configuration.md) for detailed setup instructions.
+**Paid APIs (use only when the free tools above are insufficient):**
+- **perplexity** - Synthesized search + citations in one call; use only for explicit deep-research/high-stakes requests
+- **Apify** - Actor-based scraping/crawling pipelines; audit real usage at console.apify.com before relying on it
+- **postman** - API collection management (has a free tier)
+
+See [doc/configuration.md](doc/configuration.md) for detailed setup instructions and [doc/mcp.md](doc/mcp.md) for the cost-tiering rationale.
 
 ### Cross-Platform Configuration
 
-The `mcp.json` file is configured to work seamlessly in both Windows and WSL environments. Most MCP servers use Docker containers from the [Docker Hub MCP Catalog](https://hub.docker.com/mcp), providing:
+The `mcp.json` file is configured to work seamlessly in both Windows and WSL environments. Most MCP servers use Docker containers (from the [Docker Hub MCP Catalog](https://hub.docker.com/mcp) or custom `docker/mcp-*` builds), providing:
 - **Consistent execution** - Same behavior on Windows and WSL
 - **Isolation** - Each server runs in its own container
 - **Easy updates** - Pull latest images with `docker pull`
 - **Security** - All secrets via environment variables, never hardcoded
 
-**All servers use Docker:** memory, playwright, duckduckgo, grafana, github, shrimp-task-manager
+**Docker-based:** memory, playwright, duckduckgo, searxng, grafana, github, shrimp-task-manager, postman, perplexity. **URL-based (no local container):** browseros (local BrowserOS), Apify (hosted).
 
 ### Testing MCP Servers
 
