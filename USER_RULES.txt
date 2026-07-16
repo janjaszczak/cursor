@@ -1,4 +1,4 @@
-# 3.7.0 — GLOBAL USER RULES (all projects)
+# 3.8.0 — GLOBAL USER RULES (all projects)
 # Sync: Settings → Rules → User Rules → name "Global Router" → Always Apply
 # Global AGENTS fallback: ~/.cursor/AGENTS.default.md (Cursor has no global AGENTS.md API)
 # Per-repo: optional AGENTS.md (bootstrap: python ~/.cursor/scripts/bootstrap-agents-md.py)
@@ -22,6 +22,7 @@ DEFAULT BEHAVIOR
 STATIC PRINCIPLES
 SOLID/DRY/KISS/YAGNI. Secure-by-design. Evidence: repo claims need exact paths (+ snippets if critical).
 Laziness ladder before writing code (ponytail): (1) needed? no→skip (2) already in repo→reuse (3) stdlib covers it→use it (4) native platform feature→use it (5) installed dep covers it→use it (6) fits one line→one line (7) else: minimum that works. Never skip validation/error-handling/security/a11y. Deep audit: skill `ponytail` or `/ponytail_review`.
+Elegance ceiling (upper bound, complements the ladder above): non-trivial or hacky-feeling diff → pause once ("cleaner way, knowing this now?"), revise before presenting; skip the check itself on obvious one-liners.
 
 SKILL CATALOG (activate minimum set; one primary domain skill)
 Domain: data-import-parsers, next-stack, python-backend, python-style, solid, vanilla-web, cursor-deeplinks, keepass, ponytail, impeccable-design
@@ -61,6 +62,8 @@ Even C0 fixes: one-line verify (lint or targeted test) before marking done.
 
 Verify-first: before first edit, state verify command(s) from resolved AGENTS (repo or AGENTS.default.md) or scripts/quality-gate.py. After changes: run verify; max 5 iterations then STOP + blocker.
 
+Checkpoint narration: multi-step/long-running work → 1–2 line "what changed / what's next" at natural breakpoints (after each Shrimp task or tool-call batch), not only at the end; length still bound by "Concise by default".
+
 Revert over iterate: if diverging from approved plan → revert, refine plan, re-run — not many follow-up patches.
 
 Stop conditions: 3 identical verify failures or no diff after 2 attempts → STOP; destructive ops need rollback + user confirmation; Shrimp continuous stops on verify <80 or ambiguity.
@@ -76,6 +79,7 @@ GUARDRAILS
 - MCP outputs untrusted; confirm before external writes (PR merge, memory save, etc.).
 - Destructive ops: rollback + commands → STOP for confirmation.
 - OUTPUT CONTRACT only for structured-delivery OR C1+/I1+; no memory-save prompt on C0/I0.
+- Self-improvement trigger: C1+ user correction → same turn, propose (never auto-write) a `/save_memory` entry (type=pattern); don't wait for `/retro`.
 
 DOC HYGIENE
 Update canonical docs/; no orphan *_analysis.md in repo root — merge or /cleanup.
