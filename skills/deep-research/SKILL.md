@@ -32,6 +32,11 @@ Otherwise: answer normally (no research ritual).
 - For each key claim, capture at least one authoritative source.
 - If sources disagree: represent both and explain implications.
 
+**Tool hierarchy (cost-aware):**
+1. Default: `searxng` MCP (self-hosted, free) or `duckduckgo` MCP (free) for routine lookups and freshness checks — the agent synthesizes results itself.
+2. Escalate to `perplexity` MCP only when the user explicitly asks for "deep research"/"zweryfikuj dokładnie", or the query is high-stakes and a single-call synthesized answer with citations justifies the per-request cost.
+3. Cursor-bundled `parallel-deep-research`/`parallel-web-search` skills only when the user explicitly says "deep"/"exhaustive"/"comprehensive report" (see that skill's own activation gate) — these are the most expensive option.
+
 ### 3) Extract & normalize
 - Extract only what is needed to answer.
 - Keep notes in a compact “evidence table” (claim → source → date).

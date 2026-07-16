@@ -16,6 +16,7 @@ declare -a servers=(
     "github:mcp/github:"
     "playwright:mcp/playwright:"
     "duckduckgo:mcp/duckduckgo:"
+    "searxng:isokoliuk/mcp-searxng:"
     "memory:mcp/neo4j-memory:"
     "shrimp:mcp/shrimp:"
     "postman:mcp/postman:"
@@ -89,7 +90,7 @@ if [ ${#missing_images[@]} -gt 0 ]; then
     echo "Images requiring Dockerfile:"
     for name in "${missing_images[@]}"; do
         echo "  - $name"
-    fi
+    done
 fi
 
 # Export results to JSON
