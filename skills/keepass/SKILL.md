@@ -77,7 +77,7 @@ Skrypt bash: `lib/keepass-platform.sh` → `keepass_ensure_secret_tool` (próbuj
 | OS | Komenda |
 |----|---------|
 | Linux / WSL | `~/.cursor/scripts/test-keepass-read.sh` |
-| Windows | `.\get-keepass-secret.ps1 "hosts/euk-sl01/janja" "Password"` (bez echo hasła w logu) |
+| Windows | `.\get-keepass-secret.ps1 "hosts/euk-sl01/sudo" "Password"` (bez echo hasła w logu) |
 
 Oczekiwane: odczyt bez promptu. Jeśli błąd keyringa → `KEEPASS_DB_PASSWORD='…'` + odpowiedni `setup-*`.
 
@@ -86,13 +86,13 @@ Oczekiwane: odczyt bez promptu. Jeśli błąd keyringa → `KEEPASS_DB_PASSWORD=
 ## Krok 4 — Sekrety
 
 ```bash
-# Linux / WSL
-~/.cursor/scripts/get-keepass-secret.sh "EurekaCloud/poc/SL01/janja-sudo" "Password"
+# Linux / WSL — sudo na EUK-SL01 (janja)
+~/.cursor/scripts/get-keepass-secret.sh "hosts/euk-sl01/sudo" "Password"
 ```
 
 ```powershell
 # Windows
-.\get-keepass-secret.ps1 "EurekaCloud/poc/SL01/janja-sudo" "Password"
+.\get-keepass-secret.ps1 "hosts/euk-sl01/sudo" "Password"
 ```
 
 **Check-before-add:** `keepassxc-cli search "$KEEPASS_DB_PATH" "term"` → `mkdir` / `add` / `edit`.
@@ -101,9 +101,10 @@ Oczekiwane: odczyt bez promptu. Jeśli błąd keyringa → `KEEPASS_DB_PASSWORD=
 
 | Typ | Ścieżka |
 |-----|---------|
-| Host | `hosts/<hostname>/<username>` |
+| Host SSH | `hosts/<hostname>/<username>` |
+| Host sudo | `hosts/<hostname>/sudo` (np. `hosts/euk-sl01/sudo`) |
 | Projekt | `<project>/<env>/<title>` |
-| Eureka POC | `EurekaCloud/poc/SL01/janja-sudo`, `.../paperclip-ceo-api-key`, … |
+| Eureka POC | `EurekaCloud/poc/SL01/paperclip-ceo-api-key`, … |
 
 ---
 

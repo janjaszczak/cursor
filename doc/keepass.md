@@ -25,3 +25,13 @@ Agent **doinstalowuje** brakujące pakiety/moduły; przy sudo bez NOPASSWD — p
 
 - Linux/WSL: `get-keepass-secret.sh`
 - Windows: `get-keepass-secret.ps1`
+
+### EUK-SL01 (kanoniczne ścieżki)
+
+| Wpis | Pole | Użycie |
+|------|------|--------|
+| `hosts/euk-sl01/sudo` | Password | `sudo` na hoście (user `janja`) |
+
+**Nie używaj** nieistniejących wpisów: `EurekaCloud/poc/SL01/janja-sudo`, `hosts/euk-sl01/janja`, `hosts/euk-sl01/ssh`, `hosts/euk-mc02/eureka`.
+
+| `hosts/euk-mc02/sudo` | Password | SSH + `sudo` na mc02 (user `eureka`) |
