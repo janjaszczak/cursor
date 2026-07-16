@@ -106,7 +106,9 @@ After setting, restart Cursor for changes to take effect.
 - Rotate secrets regularly
 
 **Neo4j memory server — connection from Docker:**  
-`mcp.json` runs `python -c` that executes `~/.cursor/scripts/mcp-run-memory.py` via `Path.home()` (no `${userHome}` path). The launcher loads `.env` if needed, ensures the `neo4j` container is on `mcp-network` (`restart=unless-stopped`), waits until ready, then `docker run -i --rm` `mcp/neo4j-memory` with `NEO4J_URL=bolt://neo4j:7687`.
+`mcp.json` runs `python -c` that resolves `mcp-run-memory.py` from (in order) `CURSOR_CONFIG_DIR`, `Path.home()/.cursor`, then WSL→Windows `/mnt/c/Users/$USER/.cursor` (no `${userHome}` path — that breaks on Windows as `C:\c:\Users\...`). The launcher loads `.env` from the same candidate roots, ensures the `neo4j` container is on `mcp-network` (`restart=unless-stopped`), waits until ready, then `docker run -i --rm` `mcp/neo4j-memory` with `NEO4J_URL=bolt://neo4j:7687`.
+
+**WSL note:** `/home/<user>/.cursor` and `/mnt/c/Users/<user>/.cursor` are often **two separate trees**. Keep them in sync (copy `mcp.json` + `scripts/mcp-run-memory.py`), or symlink WSL `~/.cursor` to the Windows path, or set `CURSOR_CONFIG_DIR` to the canonical tree. Otherwise Remote-WSL Cursor can still load a stale Memory config.
 
 - **Automatic:** starting the Memory MCP in Cursor starts Neo4j if needed.
 - **Manual (optional):**

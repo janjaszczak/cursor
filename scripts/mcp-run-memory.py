@@ -28,19 +28,43 @@ def log(msg: str) -> None:
     print(msg, file=sys.stderr, flush=True)
 
 
-def load_dotenv_if_needed() -> None:
-    """Load ~/.cursor/.env when Cursor envFile path expansion is broken/unavailable.
+def cursor_config_dirs() -> list[Path]:
+    """Candidate ~/.cursor roots on Windows, WSL home, and WSL→Windows mount."""
+    dirs: list[Path] = []
+    env_dir = os.environ.get("CURSOR_CONFIG_DIR", "").strip()
+    if env_dir:
+        dirs.append(Path(env_dir))
+    dirs.append(Path.home() / ".cursor")
+    user = os.environ.get("USER") or os.environ.get("USERNAME")
+    if user:
+        dirs.append(Path(f"/mnt/c/Users/{user}/.cursor"))
+    # De-dupe while preserving order.
+    seen: set[str] = set()
+    out: list[Path] = []
+    for d in dirs:
+        key = str(d)
+        if key in seen:
+            continue
+        seen.add(key)
+        out.append(d)
+    return out
 
-    On Windows, Cursor has been observed to expand `${userHome}/.cursor/...` into
-    `C:\\c:\\Users\\...` (invalid). Prefer Path.home() here instead.
+
+def load_dotenv_if_needed() -> None:
+    """Load .cursor/.env when parent env lacks Neo4j credentials.
+
+    Searches WSL home and the Windows mount so Remote-WSL / dual-.cursor setups work.
     """
     if os.environ.get("NEO4J_PASSWORD", "").strip() and os.environ.get(
         "NEO4J_PASSWORD"
     ) != "CHANGE_ME":
         return
 
-    env_path = Path.home() / ".cursor" / ".env"
-    if not env_path.is_file():
+    env_path = next(
+        (d / ".env" for d in cursor_config_dirs() if (d / ".env").is_file()),
+        None,
+    )
+    if env_path is None:
         return
 
     loaded = 0
