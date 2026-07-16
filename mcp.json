@@ -77,9 +77,6 @@
         "--transport=stdio"
       ]
     },
-    "browseros": {
-      "url": "http://127.0.0.1:9000/mcp"
-    },
     "shrimp-task-manager": {
       "command": "docker",
       "args": [
@@ -148,6 +145,9 @@
     "Apify": {
       "url": "https://mcp.apify.com",
       "headers": {}
+    },
+    "browseros": {
+      "url": "http://127.0.0.1:9200/mcp"
     }
   }
 }
