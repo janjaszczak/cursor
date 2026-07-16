@@ -10,9 +10,13 @@ No environment variables required.
 
 ```bash
 docker build -t mcp/duckduckgo ./docker/mcp-duckduckgo
-docker run -i --rm mcp/duckduckgo --transport=stdio
+docker run -i --rm mcp/duckduckgo
 ```
+
+The image uses `CMD` (not `ENTRYPOINT`). Do **not** append `--transport=stdio` or other
+args to `docker run` — Docker would replace `CMD` and the container would fail to start.
 
 ## Note
 
-This image is used when the official `mcp/duckduckgo` image is not available on Docker Hub or as a local alternative.
+Prefer the official `mcp/duckduckgo` image from the Docker Hub MCP Catalog when available.
+This Dockerfile is a local fallback with the same run contract.

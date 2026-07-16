@@ -10,7 +10,8 @@ echo ""
 echo "=== Testing MCP Servers ==="
 echo ""
 
-mcp_config_path="$HOME/.cursor/mcp.json"
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+mcp_config_path="$(cd "$script_dir/.." && pwd)/mcp.json"
 test_results=()
 errors=()
 
@@ -34,7 +35,7 @@ else
 fi
 
 # Extract server names
-servers=$(python3 << 'PYEOF'
+servers=$(python3 - "$mcp_config_path" <<'PYEOF'
 import json
 import sys
 
@@ -49,7 +50,55 @@ except Exception as e:
     print(f"Error: {e}", file=sys.stderr)
     sys.exit(1)
 PYEOF
-    "$mcp_config_path")
+)
+
+# Config contract checks (DDG + Memory)
+echo ""
+echo "Config contract checks..."
+py_cmd="python3"
+command -v python3 >/dev/null 2>&1 || py_cmd="python"
+set +e
+"$py_cmd" - "$mcp_config_path" <<'PYEOF'
+import json, sys
+path = sys.argv[1]
+with open(path, encoding="utf-8") as f:
+    cfg = json.load(f)
+servers = cfg.get("mcpServers", {})
+errors = []
+ddg = servers.get("duckduckgo", {})
+args = ddg.get("args") or []
+if any(str(a).startswith("--transport") for a in args):
+    print("  ✗ duckduckgo must not pass --transport")
+    errors.append("duckduckgo:transport")
+else:
+    print("  ✓ duckduckgo has no --transport arg")
+mem = servers.get("memory", {})
+joined = " ".join(str(a) for a in (mem.get("args") or []))
+if mem.get("command") == "python" and "mcp-run-memory.py" in joined:
+    print("  ✓ memory uses mcp-run-memory.py launcher")
+    if "${userHome}" in joined:
+        print("  ✗ memory must not use ${userHome} script path (Windows expands to C:\\c:\\...)")
+        errors.append("memory:userHomePath")
+    elif "Path.home" in joined or "-c" in (mem.get("args") or []):
+        print("  ✓ memory uses Path.home/-c (avoids broken ${userHome} path)")
+elif "NEO4J_URL=" in joined:
+    print("  ✓ memory sets NEO4J_URL")
+else:
+    print("  ✗ memory must use launcher or NEO4J_URL")
+    errors.append("memory:launcher")
+if errors:
+    sys.exit(1)
+PYEOF
+contract_rc=$?
+set -e
+if [ "$contract_rc" -eq 0 ]; then
+    test_results+=("duckduckgo:NoTransportArg:PASS")
+    test_results+=("memory:Launcher:PASS")
+else
+    test_results+=("duckduckgo:NoTransportArg:FAIL")
+    test_results+=("memory:Launcher:FAIL")
+    errors+=("Config contract checks failed")
+fi
 
 # Test each server
 echo ""
@@ -64,7 +113,7 @@ while IFS= read -r server_name; do
     echo "Testing $server_name..."
     
     # Get server config
-    server_config=$(python3 << 'PYEOF'
+    server_config=$(python3 - "$mcp_config_path" "$server_name" <<'PYEOF'
 import json
 import sys
 
@@ -83,7 +132,7 @@ except Exception as e:
     print(f"Error: {e}", file=sys.stderr)
     sys.exit(1)
 PYEOF
-        "$mcp_config_path" "$server_name")
+)
     
     command=$(echo "$server_config" | grep "^command:" | cut -d: -f2-)
     
@@ -120,6 +169,24 @@ PYEOF
             echo "  ℹ Environment variables: $env_vars"
             test_results+=("$server_name:Env Vars:PASS:$env_vars")
         fi
+    elif [ "$command" = "python" ]; then
+        resolved="$script_dir/mcp-run-memory.py"
+        if [ -f "$resolved" ]; then
+            echo "  ✓ Python launcher exists: $resolved"
+            test_results+=("$server_name:Python Launcher:PASS")
+        else
+            echo "  ✗ Python launcher missing: $resolved"
+            test_results+=("$server_name:Python Launcher:FAIL")
+            errors+=("$server_name: launcher missing")
+        fi
+        if docker --version >/dev/null 2>&1; then
+            echo "  ✓ Docker is available (for launcher)"
+            test_results+=("$server_name:Docker Available:PASS")
+        fi
+        if docker images "mcp/neo4j-memory" --format "{{.Repository}}:{{.Tag}}" 2>/dev/null | grep -q .; then
+            echo "  ✓ Image exists locally: mcp/neo4j-memory"
+            test_results+=("$server_name:Image Exists:PASS:mcp/neo4j-memory")
+        fi
     else
         echo "  ⚠ Unknown command: $command"
         test_results+=("$server_name:Command Check:WARN:Unknown command: $command")
@@ -142,7 +209,7 @@ output_dir="$HOME/.cursor/test-results"
 mkdir -p "$output_dir"
 output_path="$output_dir/mcp-test-$(date +%Y%m%d-%H%M%S).json"
 
-python3 << 'PYEOF'
+python3 - "${test_results[*]}" "${errors[*]}" "$output_path" <<'PYEOF'
 import json
 import sys
 from datetime import datetime
@@ -280,7 +347,6 @@ print(f"\nResults saved to:")
 print(f"  JSON: {output_path}")
 print(f"  HTML: {html_path}")
 PYEOF
-    "${test_results[*]}" "${errors[*]}" "$output_path"
 
 if [ ${#errors[@]} -gt 0 ]; then
     echo ""
