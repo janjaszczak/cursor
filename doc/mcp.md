@@ -46,8 +46,9 @@ See `skills/deep-research/SKILL.md` for the agent-facing tool-selection gate.
 #### Memory (Neo4j)
 - **Purpose:** Long-term project memory storage
 - **Usage:** Store architectural decisions, constraints, and lessons learned. Do NOT store passwords, API keys, or other secrets.
-- **Environment variables:** `NEO4J_URI`, `NEO4J_USERNAME`, `NEO4J_PASSWORD`, `NEO4J_DATABASE`
-- **Docker image:** `mcp/memory`
+- **Environment variables:** `NEO4J_USERNAME`, `NEO4J_PASSWORD`, `NEO4J_DATABASE` (from host env and/or `~/.cursor/.env` loaded by the launcher). The launcher sets `NEO4J_URL=bolt://neo4j:7687` (image uses **`NEO4J_URL`**, not `NEO4J_URI`).
+- **Docker images:** `neo4j:latest` (backing DB) + `mcp/neo4j-memory` (MCP server)
+- **Launcher:** `mcp.json` runs `python -c` + `Path.home()/'.cursor'/'scripts'/'mcp-run-memory.py'` (avoids broken `${userHome}` path expansion on Windows that becomes `C:\c:\Users\...`). Starts Neo4j on `mcp-network` (`restart=unless-stopped`) before `docker run -i mcp/neo4j-memory`. Manual: `scripts/start-neo4j-mcp.sh` / `.ps1`.
 
 #### Playwright
 - **Purpose:** Browser automation
@@ -59,7 +60,8 @@ See `skills/deep-research/SKILL.md` for the agent-facing tool-selection gate.
 - **Purpose:** External web search (free, keyless)
 - **Usage:** Search for information not in repo, docs, or memory. Verify current facts and technology updates. Default fallback if `searxng` is not running.
 - **Environment variables:** None required
-- **Docker image:** `mcp/duckduckgo` (built locally from `docker/mcp-duckduckgo/`, not on Docker Hub)
+- **Docker image:** `mcp/duckduckgo` (Docker Hub MCP Catalog; local fallback in `docker/mcp-duckduckgo/`)
+- **Run contract:** `docker run -i --rm mcp/duckduckgo` only — do **not** pass `--transport=stdio` (image has no ENTRYPOINT; extra args replace CMD and break startup).
 
 #### SearXNG
 - **Purpose:** External web search, aggregated engines (Google/Bing/Brave/DuckDuckGo/Wikipedia) — free, keyless, self-hosted
@@ -105,6 +107,9 @@ All MCP servers use Docker containers with this pattern:
 }
 ```
 
+
+**Exception — DuckDuckGo:** the Hub image has no `ENTRYPOINT`. Do not append `--transport=stdio` (or any args) after the image name; they replace `CMD` and the container fails to start.
+
 **Benefits:**
 - Consistent execution across Windows and WSL
 - Isolation - each server runs in its own container
@@ -129,7 +134,7 @@ See [configuration.md](configuration.md) for detailed setup instructions.
 - **mcp/grafana** - Grafana MCP server
 - **mcp/playwright** - Playwright browser automation
 - **mcp/duckduckgo** - DuckDuckGo web search
-- **mcp/memory** - Neo4j Memory MCP server
+- **mcp/neo4j-memory** - Neo4j Memory MCP server
 - **mcp/github** - GitHub MCP server
 
 ### Public Community Images (no custom Dockerfile needed)
@@ -166,7 +171,8 @@ This script checks if images exist locally, verifies availability on Docker Hub,
 docker pull mcp/grafana
 docker pull mcp/playwright
 docker pull mcp/duckduckgo
-docker pull mcp/memory
+docker pull mcp/neo4j-memory
+docker pull neo4j:latest
 docker pull mcp/github
 docker pull isokoliuk/mcp-searxng
 docker pull searxng/searxng
@@ -278,7 +284,7 @@ If using volume mounts (not recommended for cross-platform):
 
 | MCP Server | Current Version | Update Strategy |
 |------------|----------------|----------------|
-| memory | `mcp/memory` (Docker) | `docker pull mcp/memory` |
+| memory | `mcp/neo4j-memory` + `neo4j` (Docker; launcher) | `docker pull mcp/neo4j-memory && docker pull neo4j:latest` |
 | playwright | `mcp/playwright` (Docker) | `docker pull mcp/playwright` |
 | duckduckgo | `mcp/duckduckgo` (Docker) | `docker pull mcp/duckduckgo` |
 | searxng | `isokoliuk/mcp-searxng` + `searxng/searxng` (Docker) | `docker pull isokoliuk/mcp-searxng && docker pull searxng/searxng`, then re-run `scripts/start-searxng.sh` |

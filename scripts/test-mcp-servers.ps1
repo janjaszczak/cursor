@@ -1,4 +1,4 @@
-# Script to test MCP servers - health check, functional, performance, and security tests
+﻿# Script to test MCP servers - health check, functional, performance, and security tests
 # Verifies that all MCP servers work correctly with Docker
 #
 # Usage: .\scripts\test-mcp-servers.ps1
@@ -48,6 +48,46 @@ if ($securityIssues.Count -eq 0) {
     }
     $testResults += @{ Test = "Security Check"; Status = "FAIL"; Message = "Secrets found" }
     $errors += "Security check failed"
+}
+
+# Config contract checks (DDG + Memory)
+Write-Host "`nConfig contract checks..." -ForegroundColor Yellow
+$ddg = $mcpConfig.mcpServers.duckduckgo
+if ($ddg -and $ddg.command -eq "docker") {
+    $ddgArgs = @($ddg.args)
+    if ($ddgArgs -contains "--transport=stdio" -or ($ddgArgs | Where-Object { $_ -like "--transport*" })) {
+        Write-Host "  [ERROR] duckduckgo must not pass --transport (breaks Hub image CMD)" -ForegroundColor Red
+        $testResults += @{ Server = "duckduckgo"; Test = "NoTransportArg"; Status = "FAIL" }
+        $errors += "duckduckgo: unexpected --transport arg"
+    } else {
+        Write-Host "  [OK] duckduckgo has no --transport arg" -ForegroundColor Green
+        $testResults += @{ Server = "duckduckgo"; Test = "NoTransportArg"; Status = "PASS" }
+    }
+} else {
+    Write-Host "  [WARN] duckduckgo entry missing or not docker" -ForegroundColor Yellow
+    $testResults += @{ Server = "duckduckgo"; Test = "NoTransportArg"; Status = "WARN" }
+}
+
+$mem = $mcpConfig.mcpServers.memory
+$memArgs = if ($mem) { @($mem.args) -join " " } else { "" }
+if ($mem -and $mem.command -eq "python" -and $memArgs -match "mcp-run-memory\.py") {
+    Write-Host "  [OK] memory uses mcp-run-memory.py launcher" -ForegroundColor Green
+    $testResults += @{ Server = "memory"; Test = "Launcher"; Status = "PASS" }
+    if ($memArgs -match "Path\.home\(" -or $memArgs -match "-c") {
+        Write-Host "  [OK] memory avoids broken `${userHome}` path (uses Path.home / -c)" -ForegroundColor Green
+        $testResults += @{ Server = "memory"; Test = "NoUserHomePath"; Status = "PASS" }
+    } elseif ($memArgs -match '\$\{userHome\}') {
+        Write-Host "  [ERROR] memory must not use `${userHome}` script path on Windows (becomes C:\c:\...)" -ForegroundColor Red
+        $testResults += @{ Server = "memory"; Test = "NoUserHomePath"; Status = "FAIL" }
+        $errors += "memory: forbidden `${userHome}` script path"
+    }
+} elseif ($mem -and $memArgs -match "NEO4J_URL=") {
+    Write-Host "  [OK] memory sets NEO4J_URL" -ForegroundColor Green
+    $testResults += @{ Server = "memory"; Test = "Neo4jUrl"; Status = "PASS" }
+} else {
+    Write-Host "  [ERROR] memory must use launcher or NEO4J_URL" -ForegroundColor Red
+    $testResults += @{ Server = "memory"; Test = "Launcher"; Status = "FAIL" }
+    $errors += "memory: expected mcp-run-memory.py launcher or NEO4J_URL"
 }
 
 # Test each server
@@ -143,6 +183,33 @@ foreach ($serverName in $servers) {
         if ($envVars.Count -gt 0) {
             Write-Host "  [INFO] Environment variables: $($envVars -join ', ')" -ForegroundColor Gray
             $testResults += @{ Server = $serverName; Test = "Env Vars"; Status = "PASS"; EnvVars = $envVars }
+        }
+    } elseif ($command -eq "python") {
+        $joinedArgs = @($server.args) -join " "
+        $resolved = Join-Path $env:USERPROFILE ".cursor\scripts\mcp-run-memory.py"
+        if ($joinedArgs -match "mcp-run-memory\.py" -and (Test-Path $resolved)) {
+            Write-Host "  [OK] Python launcher exists: $resolved" -ForegroundColor Green
+            $testResults += @{ Server = $serverName; Test = "Python Launcher"; Status = "PASS" }
+        } elseif ($joinedArgs -match "Path\.home" -and (Test-Path $resolved)) {
+            Write-Host "  [OK] Python -c Path.home launcher resolves: $resolved" -ForegroundColor Green
+            $testResults += @{ Server = $serverName; Test = "Python Launcher"; Status = "PASS" }
+        } else {
+            Write-Host "  [ERROR] Python launcher missing: $resolved" -ForegroundColor Red
+            $testResults += @{ Server = $serverName; Test = "Python Launcher"; Status = "FAIL" }
+            $errors += "${serverName}: launcher missing"
+        }
+        try {
+            $dockerVersion = docker --version 2>&1
+            if ($LASTEXITCODE -eq 0) {
+                Write-Host "  [OK] Docker is available (for launcher)" -ForegroundColor Green
+                $testResults += @{ Server = $serverName; Test = "Docker Available"; Status = "PASS" }
+            }
+        } catch {}
+        $memImg = "mcp/neo4j-memory"
+        $imageCheck = docker images $memImg --format "{{.Repository}}:{{.Tag}}" 2>&1
+        if ($LASTEXITCODE -eq 0 -and $imageCheck) {
+            Write-Host "  [OK] Image exists locally: $memImg" -ForegroundColor Green
+            $testResults += @{ Server = $serverName; Test = "Image Exists"; Status = "PASS"; Image = $memImg }
         }
     } else {
         Write-Host "  [WARN] Unknown command: $command" -ForegroundColor Yellow

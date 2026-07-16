@@ -1,10 +1,12 @@
 # Dockerfile for DuckDuckGo MCP Server
-# This image wraps duckduckgo-mcp-server for Docker execution
+# Aligns with the Docker Hub MCP Catalog image (mcp/duckduckgo):
+# Entrypoint is null; CMD starts the stdio server. Do not pass extra
+# docker-run args (e.g. --transport=stdio) — they replace CMD and break startup.
 
 FROM python:3.11-alpine
 
-# Install uvx and duckduckgo-mcp-server
-RUN pip install --no-cache-dir uvx duckduckgo-mcp-server
+WORKDIR /app
 
-# Run the MCP server
-ENTRYPOINT ["uvx", "duckduckgo-mcp-server"]
+RUN pip install --no-cache-dir duckduckgo-mcp-server
+
+CMD ["python", "-m", "duckduckgo_mcp_server.server"]

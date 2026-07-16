@@ -185,3 +185,30 @@ PYEOF
     append_env_vars ~/.bashrc
     echo "✓ Updated ~/.bashrc with variables from .env"
 fi
+
+# Ensure `python` resolves for mcp.json memory launcher (Windows uses `python`;
+# Ubuntu/Debian often only ship `python3`).
+if ! command -v python >/dev/null 2>&1 && command -v python3 >/dev/null 2>&1; then
+    if command -v apt-get >/dev/null 2>&1; then
+        if [ "$EUID" -eq 0 ]; then
+            apt-get install -y python-is-python3 >/dev/null 2>&1 || true
+        elif command -v sudo >/dev/null 2>&1; then
+            sudo apt-get install -y python-is-python3 >/dev/null 2>&1 || true
+        fi
+    fi
+    if ! command -v python >/dev/null 2>&1; then
+        mkdir -p "$HOME/.local/bin"
+        ln -sf "$(command -v python3)" "$HOME/.local/bin/python"
+        case ":$PATH:" in
+            *":$HOME/.local/bin:"*) ;;
+            *)
+                echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.profile"
+                echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.bashrc"
+                export PATH="$HOME/.local/bin:$PATH"
+                ;;
+        esac
+        echo "✓ Ensured python -> python3 via ~/.local/bin/python (for memory MCP launcher)"
+    else
+        echo "✓ python command available (python-is-python3 or existing)"
+    fi
+fi
