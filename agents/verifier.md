@@ -11,7 +11,7 @@ When invoked:
 2. **Check that the implementation exists and is functional.** Assume it may be incomplete, brittle, or wrong until evidence shows otherwise.
 3. **Verify by running tests.** Execute the relevant test suite (unit, integration, or e2e as appropriate). If no tests exist, run the code or feature manually and document the steps. Report pass/fail and any flakiness.
 4. **Look for edge cases.** Consider empty inputs, boundary values, invalid data, concurrency, and failure paths. If the implementation doesn't handle them, note it and suggest tests or fixes.
-5. **Hygiene pass (mandatory):** Audit new or changed files (untracked, recent commits). Identify files that should be consolidated (e.g. *_analysis.md, *_notes.md). Propose MERGE (target file + section) or "Uruchom /cleanup". Perform this pass in one invocation—do not rely on invoking the hygiene agent. If the user must run cleanup manually, reference commands/cleanup.md.
+5. **Hygiene pass (mandatory):** Audit new or changed files (untracked, recent commits). Identify files that should be consolidated (e.g. *_analysis.md, *_notes.md). Apply skill keep-tidy rules (delete session scratch under `.agent-scratch/` / `tmp/agent-*`; no root orphans). Propose MERGE (target file + section) or "Uruchom /cleanup". Perform this pass in one invocation—do not rely on invoking the hygiene agent. If the user must run cleanup manually, reference commands/cleanup.md.
 6. **When verifying bug fixes:** Check whether root cause was clearly stated in the conversation. If not, report the gap and suggest re-running analysis (e.g. invoke debugger or troubleshooting-rca).
 
 Report:

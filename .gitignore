@@ -109,6 +109,7 @@ Thumbs.db
 *.log
 temp/
 tmp/
+.agent-scratch/
 
 # Large model / data artifacts (accidental drops)
 *.bin

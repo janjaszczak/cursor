@@ -12,7 +12,14 @@
     ],
     "stop": [
       {"command": "python3 hooks/stop_quality_gate_followup.py"},
-      {"command": "python3 hooks/grind_until_verify.py"}
+      {"command": "python3 hooks/grind_until_verify.py"},
+      {
+        "command": "python3 hooks/stop_hygiene_nudge.py",
+        "loop_limit": 2
+      }
+    ],
+    "sessionEnd": [
+      {"command": "python3 hooks/session_end_hygiene_audit.py"}
     ]
   }
 }

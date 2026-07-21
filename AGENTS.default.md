@@ -30,6 +30,7 @@ Prefer one `scripts/quality-gate.py` per repo that wraps the above.
 - [ ] Verify command exited 0 (name which ran)
 - [ ] No new linter/type errors in touched files
 - [ ] Shrimp `verify_task` ≥80 OR verifier pass OR user sign-off
+- [ ] No orphan agent scratch left (skill keep-tidy: no root `*_analysis.md` / scratch; `.agent-scratch/` and `tmp/agent-*` empty or removed)
 
 ## Stop / escalate
 

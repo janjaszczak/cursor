@@ -68,6 +68,8 @@ Returns: Memory about GitHub token configuration and WSL setup
 
 **Purpose:** Post-work repo hygiene: audit scripts, docs, and artifacts; propose KEEP/MOVE/MERGE/DELETE; apply only after user types "APPLY CLEANUP"
 
+**Continuous counterpart:** skill `keep-tidy` + stop/sessionEnd hygiene hooks (clean as you go during the session). Use `/cleanup` for deep consolidation.
+
 **Usage:**
 ```
 /cleanup

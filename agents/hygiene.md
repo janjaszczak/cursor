@@ -14,7 +14,7 @@ When invoked:
 
 Principles:
 - Default is SAFE: propose first; do not delete/move/rename until the user confirms (e.g. APPLY CLEANUP).
-- Align with commands/cleanup.md procedure and migration-and-doc-consolidation skill.
+- Align with commands/cleanup.md procedure, skill keep-tidy (continuous during work), and migration-and-doc-consolidation (migrations / canonical runbooks).
 - If memory (Neo4j) is available: recall canonical docs/scripts locations for the repo before proposing.
 
-**Preferred MCP:** Read (repo layout, git status). Optional: memory (canonical locations). Use commands/cleanup.md for full procedure.
+**Preferred MCP:** Read (repo layout, git status). Optional: memory (canonical locations). Use skill keep-tidy for in-session rules; commands/cleanup.md for full deep procedure.

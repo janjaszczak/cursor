@@ -3,6 +3,10 @@
 You are in CLEANUP mode. Goal: restore repo order after agent work.
 Default is SAFE (dry-run). Do NOT delete/move/rename until user confirms: **APPLY CLEANUP**.
 
+**Continuous hygiene (during work):** skill `keep-tidy` + hooks `stop_hygiene_nudge` /
+`session_end_hygiene_audit`. This command is the **deep** audit (MERGE/MOVE scripts/docs).
+Do not duplicate a full keep-tidy pass unless leftovers remain after those hooks.
+
 ## 0) Preconditions (Git safety)
 - Confirm current branch and status. Prefer Git as rollback (commit checkpoints per cleanup step).
 - If there are important uncommitted changes unrelated to cleanup, STOP and ask what to do.
