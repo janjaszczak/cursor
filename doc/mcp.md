@@ -94,8 +94,8 @@ See `skills/deep-research/SKILL.md` for the agent-facing tool-selection gate.
 #### Context7
 - **Purpose:** Version-specific documentation and code examples for libraries/frameworks
 - **Usage:** When implementing against third-party APIs where training data may be stale; prompt with "use context7" or activate skill `mcp-context7-docs`. Not for general web search (use searxng/duckduckgo).
-- **Environment variables:** None required for anonymous use. Optional `CONTEXT7_API_KEY` via MCP server headers in Cursor Settings for higher rate limits ([context7.com/dashboard](https://context7.com/dashboard)).
-- **Connection:** URL-based — `https://mcp.context7.com/mcp` in `mcp.json` (no Docker container).
+- **Environment variables:** `CONTEXT7_API_KEY` in `~/.cursor/.env` (KeePass `API Keys/Context7`). See **[mcp-secrets.md](mcp-secrets.md)**.
+- **Connection:** Stdio via `scripts/mcp-run-context7.py` (loads `.env`, runs `@upstash/context7-mcp`). Requires Node.js 18+ / `npx` on PATH.
 
 ## Execution Model
 
@@ -126,14 +126,13 @@ All MCP servers use Docker containers with this pattern:
 
 ## Environment Variables
 
-**IMPORTANT:** All MCP environment variables must be set in **WSL** (where Docker runs), not in Windows.
+Secrets and API keys: **[mcp-secrets.md](mcp-secrets.md)** (KeePass → `.env`, verify, troubleshooting).
 
-**Required variables:**
-- `NEO4J_URI`, `NEO4J_USERNAME`, `NEO4J_PASSWORD`, `NEO4J_DATABASE` - For memory server
-- `GITHUB_PERSONAL_ACCESS_TOKEN` - For GitHub server
-- `GRAFANA_URL`, `GRAFANA_API_KEY` - For Grafana server
+**IMPORTANT:** Docker MCPs need variables in the **Cursor process environment** (often via `setup-env-vars.*` after editing `.env`). Launchers **memory** and **context7** read `~/.cursor/.env` directly.
 
-See [configuration.md](configuration.md) for detailed setup instructions.
+**Common variables:** `NEO4J_*`, `GITHUB_PERSONAL_ACCESS_TOKEN`, `GRAFANA_URL`, `GRAFANA_API_KEY`, `POSTMAN_API_KEY`, `PERPLEXITY_API_KEY`, `CONTEXT7_API_KEY` — see [`.env.example`](../.env.example).
+
+Full setup: [configuration.md](configuration.md).
 
 ## Docker Images
 

@@ -1,7 +1,7 @@
 ---
 name: mcp-context7-docs
 description: Fetch version-specific library and framework documentation via Context7 MCP. Use when implementing against third-party APIs/SDKs where model knowledge may be stale, or when the user says "use context7" / asks for current docs for a named library.
-compatibility: Requires context7 MCP in mcp.json (remote URL). Network access to mcp.context7.com. Optional CONTEXT7_API_KEY in Cursor MCP headers for higher rate limits.
+compatibility: Requires context7 MCP in mcp.json (launcher scripts/mcp-run-context7.py). CONTEXT7_API_KEY in ~/.cursor/.env (from KeePass API Keys/Context7). Node.js 18+ and npx on PATH.
 allowed-tools: MCP(*)
 metadata:
   author: janjaszczak
@@ -38,4 +38,4 @@ Do **not** activate for:
 
 ## Failure handling
 
-- MCP unreachable: suggest Cursor restart after confirming `context7` entry in `mcp.json`; optional free key at context7.com/dashboard for rate limits.
+- MCP unreachable: confirm `context7` in `mcp.json`, `CONTEXT7_API_KEY` in `~/.cursor/.env` — runbook [doc/mcp-secrets.md](../../doc/mcp-secrets.md); restart Cursor; Node.js 18+ / `npx` on PATH.

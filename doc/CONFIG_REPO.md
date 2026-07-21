@@ -8,6 +8,7 @@ Not loaded by Cursor as a rule. Global behavior → [`USER_RULES.txt`](../USER_R
 |-------|---------|
 | Quality gate | `python scripts/quality-gate.py .` |
 | Hook smoke test | `python scripts/test-quality-gate-hook.py` |
+| MCP env / secrets | [doc/mcp-secrets.md](mcp-secrets.md) |
 
 ## Do not edit manually
 

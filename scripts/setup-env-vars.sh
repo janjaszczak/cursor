@@ -34,6 +34,7 @@ GRAFANA_URL=http://localhost:3001
 GRAFANA_API_KEY=CHANGE_ME
 POSTMAN_API_KEY=CHANGE_ME
 PERPLEXITY_API_KEY=CHANGE_ME
+CONTEXT7_API_KEY=CHANGE_ME
 ENVEOF
     echo "✓ Template created. Please edit .env and run script again."
     exit 0
@@ -66,6 +67,9 @@ fi
 if [ "$PERPLEXITY_API_KEY" = "CHANGE_ME" ] || [ -z "$PERPLEXITY_API_KEY" ]; then
     echo "⚠ PERPLEXITY_API_KEY is not set (CHANGE_ME or empty)"
 fi
+if [ "$CONTEXT7_API_KEY" = "CHANGE_ME" ] || [ -z "$CONTEXT7_API_KEY" ]; then
+    echo "⚠ CONTEXT7_API_KEY is not set (CHANGE_ME or empty)"
+fi
 
 echo ""
 echo "Environment variables loaded from .env."
@@ -87,6 +91,7 @@ if [ "$EUID" -eq 0 ]; then
         [ -n "$GRAFANA_API_KEY" ] && [ "$GRAFANA_API_KEY" != "CHANGE_ME" ] && echo "GRAFANA_API_KEY=\"$GRAFANA_API_KEY\""
         [ -n "$POSTMAN_API_KEY" ] && [ "$POSTMAN_API_KEY" != "CHANGE_ME" ] && echo "POSTMAN_API_KEY=\"$POSTMAN_API_KEY\""
         [ -n "$PERPLEXITY_API_KEY" ] && [ "$PERPLEXITY_API_KEY" != "CHANGE_ME" ] && echo "PERPLEXITY_API_KEY=\"$PERPLEXITY_API_KEY\""
+        [ -n "$CONTEXT7_API_KEY" ] && [ "$CONTEXT7_API_KEY" != "CHANGE_ME" ] && echo "CONTEXT7_API_KEY=\"$CONTEXT7_API_KEY\""
     } >> /etc/environment
     echo "✓ Appended to /etc/environment (system-wide)"
 else
@@ -174,6 +179,7 @@ PYEOF
             [ -n "$GRAFANA_API_KEY" ] && [ "$GRAFANA_API_KEY" != "CHANGE_ME" ] && echo "export GRAFANA_API_KEY=\"$GRAFANA_API_KEY\""
             [ -n "$POSTMAN_API_KEY" ] && [ "$POSTMAN_API_KEY" != "CHANGE_ME" ] && echo "export POSTMAN_API_KEY=\"$POSTMAN_API_KEY\""
             [ -n "$PERPLEXITY_API_KEY" ] && [ "$PERPLEXITY_API_KEY" != "CHANGE_ME" ] && echo "export PERPLEXITY_API_KEY=\"$PERPLEXITY_API_KEY\""
+            [ -n "$CONTEXT7_API_KEY" ] && [ "$CONTEXT7_API_KEY" != "CHANGE_ME" ] && echo "export CONTEXT7_API_KEY=\"$CONTEXT7_API_KEY\""
         } >> "$file_path"
     }
     

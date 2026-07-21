@@ -26,6 +26,8 @@ Agent **doinstalowuje** brakujące pakiety/moduły; przy sudo bez NOPASSWD — p
 - Linux/WSL: `get-keepass-secret.sh`
 - Windows: `get-keepass-secret.ps1`
 
+**Klucze API pod MCP (Context7, GitHub, …):** KeePass → `~/.cursor/.env` — pełna procedura w **[doc/mcp-secrets.md](mcp-secrets.md)**.
+
 ### EUK-SL01 (kanoniczne ścieżki)
 
 | Wpis | Pole | Użycie |

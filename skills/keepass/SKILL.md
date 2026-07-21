@@ -104,6 +104,7 @@ Oczekiwane: odczyt bez promptu. Jeśli błąd keyringa → `KEEPASS_DB_PASSWORD=
 | Host SSH | `hosts/<hostname>/<username>` |
 | Host sudo | `hosts/<hostname>/sudo` (np. `hosts/euk-sl01/sudo`) |
 | Projekt | `<project>/<env>/<title>` |
+| MCP API keys | `API Keys/<Service>` (np. `API Keys/Context7`) — patrz [doc/mcp-secrets.md](../doc/mcp-secrets.md) |
 | Eureka POC | `EurekaCloud/poc/SL01/paperclip-ceo-api-key`, … |
 
 ---
@@ -124,7 +125,8 @@ Oczekiwane: odczyt bez promptu. Jeśli błąd keyringa → `KEEPASS_DB_PASSWORD=
 | `add-host-entry.sh` | nowy host (bash) |
 | `keepass_ops.py` | get/add/update |
 
-Runbook: `~/.cursor/doc/keepass.md`
+Runbook: `~/.cursor/doc/keepass.md`  
+MCP keys → `.env`: `~/.cursor/doc/mcp-secrets.md`
 
 ---
 

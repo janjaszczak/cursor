@@ -83,6 +83,7 @@ required_vars=(
     "GRAFANA_API_KEY"
     "POSTMAN_API_KEY"
     "PERPLEXITY_API_KEY"
+    "CONTEXT7_API_KEY"
 )
 
 for var in "${required_vars[@]}"; do
