@@ -179,6 +179,17 @@ PYEOF
             test_results+=("$server_name:Python Launcher:FAIL")
             errors+=("$server_name: launcher missing")
         fi
+        if [ "$server_name" = "context7" ]; then
+            ctx7="$script_dir/mcp-run-context7.py"
+            if [ -f "$ctx7" ]; then
+                echo "  ✓ Context7 launcher exists: $ctx7"
+                test_results+=("$server_name:Context7 Launcher:PASS")
+            else
+                echo "  ✗ Context7 launcher missing: $ctx7"
+                test_results+=("$server_name:Context7 Launcher:FAIL")
+                errors+=("$server_name: context7 launcher missing")
+            fi
+        fi
         if docker --version >/dev/null 2>&1; then
             echo "  ✓ Docker is available (for launcher)"
             test_results+=("$server_name:Docker Available:PASS")

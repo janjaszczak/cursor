@@ -7,14 +7,15 @@ This repository serves as the **single source of truth** for Cursor IDE configur
 1. **Set `CURSOR_CONFIG_DIR`** to point to this user directory:
    - Windows: `C:\Users\janja\.cursor`
    - WSL: `~/.cursor`
-2. **Configure MCP environment variables** in WSL (see [doc/configuration.md](doc/configuration.md))
+2. **Configure MCP secrets** — KeePass → `~/.cursor/.env` ([doc/mcp-secrets.md](doc/mcp-secrets.md)); optional `setup-env-vars.*` for Docker MCPs ([doc/configuration.md](doc/configuration.md))
 3. **Restart Cursor** to apply changes
 
 ## Documentation
 
 All documentation is in the **[doc/](doc/)** directory:
 
-- **[doc/configuration.md](doc/configuration.md)** - Complete configuration guide and current setup (start here)
+- **[doc/mcp-secrets.md](doc/mcp-secrets.md)** - **API keys / env vars** (KeePass → `.env`, verify, troubleshooting)
+- **[doc/configuration.md](doc/configuration.md)** - Complete configuration guide and current setup
 - **[doc/mcp.md](doc/mcp.md)** - MCP server configuration, Docker management, and troubleshooting
 - **[doc/rules.md](doc/rules.md)** - Project rules and conventions
 - **[doc/commands.md](doc/commands.md)** - Custom Cursor commands
@@ -65,7 +66,7 @@ This configuration includes 12 servers. Free/self-hosted (no per-request cost) a
 - **grafana** - Metrics and dashboards
 - **browseros** - Visible browser automation (user's own Chromium profile)
 - **shrimp-task-manager** - Task planning and execution
-- **context7** - Version-specific library documentation lookup (remote MCP, no API key required to start)
+- **context7** - Version-specific library documentation lookup (`mcp-run-context7.py` + `CONTEXT7_API_KEY` in `.env`)
 
 **Paid APIs (use only when the free tools above are insufficient):**
 - **perplexity** - Synthesized search + citations in one call; use only for explicit deep-research/high-stakes requests
@@ -82,7 +83,7 @@ The `mcp.json` file is configured to work seamlessly in both Windows and WSL env
 - **Easy updates** - Pull latest images with `docker pull`
 - **Security** - All secrets via environment variables, never hardcoded
 
-**Docker-based:** memory, playwright, duckduckgo, searxng, grafana, github, shrimp-task-manager, postman, perplexity. **URL-based (no local container):** browseros (local BrowserOS), Apify (hosted), context7 (hosted docs).
+**Docker-based:** memory, playwright, duckduckgo, searxng, grafana, github, shrimp-task-manager, postman, perplexity. **URL-based (no local container):** browseros (local BrowserOS), Apify (hosted). **Launcher (stdio, reads `.env`):** context7 (`@upstash/context7-mcp` via `mcp-run-context7.py`).
 
 ### Testing MCP Servers
 

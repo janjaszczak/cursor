@@ -218,4 +218,4 @@ Commands can use MCP tools:
 - Context7 MCP (via skill `mcp-context7-docs`) for version-specific library documentation — not for general search
 - Other MCP tools as needed
 
-See [mcp.md](mcp.md) for available MCP servers.
+See [mcp.md](mcp.md) for available MCP servers. API keys: [mcp-secrets.md](mcp-secrets.md).
