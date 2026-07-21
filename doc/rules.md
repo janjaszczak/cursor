@@ -46,7 +46,7 @@ Config repo maintenance: [`doc/CONFIG_REPO.md`](CONFIG_REPO.md)
 
 | Entry | Source |
 |-------|--------|
-| `# 3.6.0 — GLOBAL USER RULES…` | User Rules (correct) |
+| `# 3.9.0 — GLOBAL USER RULES…` (or current version in repo) | User Rules (correct) |
 | `AGENTS` | Project `AGENTS.md` only — delete duplicates; do **not** use `AGENTS.md` in ~/.cursor root |
 | Plugin rules | `workers`, `citation-standards` |
 

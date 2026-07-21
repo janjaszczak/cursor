@@ -33,9 +33,10 @@ Otherwise: answer normally (no research ritual).
 - If sources disagree: represent both and explain implications.
 
 **Tool hierarchy (cost-aware):**
-1. Default: `searxng` MCP (self-hosted, free) or `duckduckgo` MCP (free) for routine lookups and freshness checks — the agent synthesizes results itself.
-2. Escalate to `perplexity` MCP only when the user explicitly asks for "deep research"/"zweryfikuj dokładnie", or the query is high-stakes and a single-call synthesized answer with citations justifies the per-request cost.
-3. Cursor-bundled `parallel-deep-research`/`parallel-web-search` skills only when the user explicitly says "deep"/"exhaustive"/"comprehensive report" (see that skill's own activation gate) — these are the most expensive option.
+1. **Named library/framework API docs (version-aware):** `context7` MCP + skill `mcp-context7-docs` — not general web search.
+2. Default: `searxng` MCP (self-hosted, free) or `duckduckgo` MCP (free) for routine lookups and freshness checks — the agent synthesizes results itself.
+3. Escalate to `perplexity` MCP only when the user explicitly asks for "deep research"/"zweryfikuj dokładnie", or the query is high-stakes and a single-call synthesized answer with citations justifies the per-request cost.
+4. Cursor-bundled `parallel-deep-research`/`parallel-web-search` skills only when the user explicitly says "deep"/"exhaustive"/"comprehensive report" (see that skill's own activation gate) — these are the most expensive option.
 
 ### 3) Extract & normalize
 - Extract only what is needed to answer.

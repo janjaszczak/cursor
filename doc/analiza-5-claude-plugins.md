@@ -207,16 +207,12 @@ sekcji 4, najprostsze polecenia:
 - Architektura tego repo (Cursor, nie Claude Code) potwierdzona z pierwszej ręki:
   [`doc/hooks.md`](hooks.md) (4 typy hooków, link do `cursor.com/docs/agent/hooks`),
   [`skills/ponytail/SKILL.md`](../skills/ponytail/SKILL.md) (`compatibility:` explicite mówi
-  „Cursor has no native plugin/skill-command runtime”), `mcp.json` (11 serwerów, zliczone
-  ręcznie i zgodne z `README.md`).
+  „Cursor has no native plugin/skill-command runtime”), `mcp.json` (w chwili analizy: 11 serwerów; po wdrożeniu: 12 — Context7).
 - Kluczowe twierdzenia zewnętrzne zweryfikowane web-search (lipiec 2026), nie z pamięci
   modelu — patrz linki inline w sekcji 3. Najważniejsza korekta: benchmark Caveman na pracy
   agentowej (~8,5%) vs reklamowane ~65-75% (chat/proza) — źródło:
   [JetBrains AI blog](https://blog.jetbrains.com/ai/2026/07/speak-to-ai-agents-like-cavemen-tosave-tokens/).
-- Manualny test (do wykonania przez Ciebie, opcjonalnie): jeśli zdecydujesz się na Context7,
-  po dodaniu do `mcp.json` sprawdź w nowej sesji, że fraza „use context7” albo praca w
-  `python-backend`/`next-stack` faktycznie zwraca dokumentację z `context7.com`, nie ogólny
-  wynik z searxng/duckduckgo.
+- Manualny test Context7 (po wdrożeniu): restart Cursor, „use context7" dla jednej biblioteki; sync User Rules **3.9.0** z [`USER_RULES.txt`](../USER_RULES.txt).
 
 CoVe: zastosowano (5 pytań weryfikacyjnych: czy pluginy Claude Code instalują się w Cursorze
 1:1?, czy Context7 jest wyjątkiem jako zwykły MCP?, czy hook schema Cursora pozwala odtworzyć

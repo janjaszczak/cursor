@@ -341,16 +341,19 @@ Most MCPs execute via Docker for cross-platform consistency (Windows and WSL); `
 5. `parsers.mdc` - Data parsing rules (`data/**`)
 6. `solid.mdc` - SOLID principles (`**/*.{ts,tsx,js,jsx,py,env,yml,md}`)
 
-**Note:** Global engineering policies (quality, MCP tools usage) are now integrated into `cursor-user_roles.txt` at the repository root. This provides a single source of truth for workflow, quality requirements, and MCP tool usage guidelines.
+**Note:** Global engineering policies live in [`USER_RULES.txt`](../USER_RULES.txt) (sync to Settings → User Rules → **Global Router**). See [rules.md](rules.md).
 
 ### Commands
 
-4 custom commands are defined:
+Seven custom commands are defined (see [commands.md](commands.md)):
 
-1. `/save_memory` - Force write to Neo4j memory (no extra confirmation)
-2. `/recall_memory` - Search Neo4j memory first before starting work
-3. `/cleanup` - Post-work repo hygiene: audit → proposal → apply only after "APPLY CLEANUP"
-4. `/retro` - Chat retrospective: issues, compliance audit, proposed improvements (USER RULES / PROJECT RULES / SKILLS / MEMORY); interactive APPLY
+1. `/save_memory` — force write to Neo4j memory
+2. `/recall_memory` — search memory before starting work
+3. `/cleanup` — repo hygiene proposal (apply after **APPLY CLEANUP**)
+4. `/retro` — chat retrospective with optional **APPLY**
+5. `/status` — read-only status snapshot
+6. `/next` — pick next task and start execution
+7. `/ponytail_review` — over-engineering audit (ponytail ladder)
 
 See [commands.md](commands.md) for full descriptions.
 

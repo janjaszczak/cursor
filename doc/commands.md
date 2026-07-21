@@ -215,6 +215,7 @@ Commands can use MCP tools:
 - `create_entities` / `search_memories` (user-memory MCP) for Neo4j memory
 - `github_*` for GitHub operations
 - `grafana_*` for metrics
+- Context7 MCP (via skill `mcp-context7-docs`) for version-specific library documentation — not for general search
 - Other MCP tools as needed
 
 See [mcp.md](mcp.md) for available MCP servers.
