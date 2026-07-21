@@ -22,6 +22,7 @@ Activate if:
    - Repo evidence (if applicable)
    - Minimal test commands
    - Web research (authoritative sources)
+   - For code security patterns: apply the checklist in `agents/security-auditor.md` (or invoke the security-auditor subagent).
 4. Revise solution and mark remaining uncertainties.
 
 ## Output

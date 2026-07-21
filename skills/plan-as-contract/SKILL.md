@@ -14,6 +14,7 @@ Use if:
 - Multi-file changes, migrations, security/perf sensitive work, or irreversible ops.
 
 ## Procedure
+0. If requirements are unclear or acceptance criteria are missing: ask 2–5 clarifying questions (scope, constraints, verify commands) before drafting the plan. Do not assume.
 1. Define objective + acceptance criteria (testable).
 2. Enumerate touched areas: BE/FE/DB/config/CI/CD/infra (or explicitly “NOT touched”).
 3. Identify dependencies (APIs, flags, secrets, external services).

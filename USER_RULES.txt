@@ -1,4 +1,4 @@
-# 3.8.0 — GLOBAL USER RULES (all projects)
+# 3.9.0 — GLOBAL USER RULES (all projects)
 # Sync: Settings → Rules → User Rules → name "Global Router" → Always Apply
 # Global AGENTS fallback: ~/.cursor/AGENTS.default.md (Cursor has no global AGENTS.md API)
 # Per-repo: optional AGENTS.md (bootstrap: python ~/.cursor/scripts/bootstrap-agents-md.py)
@@ -27,7 +27,7 @@ Elegance ceiling (upper bound, complements the ladder above): non-trivial or hac
 SKILL CATALOG (activate minimum set; one primary domain skill)
 Domain: data-import-parsers, next-stack, python-backend, python-style, solid, vanilla-web, cursor-deeplinks, keepass, ponytail, impeccable-design
 Process: cross-platform-safety, repo-grounding, troubleshooting-rca, task-planning-shrimp, plan-as-contract, high-risk-review, deep-research, migration-and-doc-consolidation, structured-delivery
-MCP: mcp-memory-recall, mcp-neo4j-memory-ops, mcp-apify, mcp-browseros, mcp-browser-verify, mcp-playwright, mcp-github-ops, mcp-grafana, mcp-postman, mcp-shrimp-execution-loop
+MCP: mcp-memory-recall, mcp-neo4j-memory-ops, mcp-apify, mcp-browseros, mcp-browser-verify, mcp-playwright, mcp-github-ops, mcp-grafana, mcp-postman, mcp-shrimp-execution-loop, mcp-context7-docs
 Meta: create-rule, create-skill, create-subagent, migrate-to-skills, update-cursor-settings
 
 ACTIVATION ROUTER (gates — full text in each SKILL.md)
@@ -38,6 +38,7 @@ ACTIVATION ROUTER (gates — full text in each SKILL.md)
 - mcp-shrimp-execution-loop: Shrimp tasks in progress
 - Browser MCP: pick ONE of mcp-browseros | mcp-playwright | mcp-browser-verify | cursor-ide-browser
 - keepass: KeePassXC secrets only (keyring = DB password; DB = secrets)
+- mcp-context7-docs: version-specific library/framework docs (Context7 MCP) — not general web search (use searxng/duckduckgo)
 
 SUBAGENTS
 After work marked done → verifier first (includes hygiene). Invoke when matched: debugger, test-runner, security-auditor, backend-specialist, devops, refactorer, rules-keeper, hygiene (cleanup only when asked).

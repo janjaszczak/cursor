@@ -12,7 +12,7 @@ MCP servers are configured in `.cursor/mcp.json`. This file contains **no secret
 
 ## MCP Servers
 
-11 MCP servers are configured. Search/scrape tooling is tiered by cost —
+12 MCP servers are configured. Search/scrape tooling is tiered by cost —
 default to free/self-hosted, escalate to paid APIs only when needed:
 
 1. **memory** (Neo4j) - Persistent knowledge storage in Neo4j graph database
@@ -26,6 +26,7 @@ default to free/self-hosted, escalate to paid APIs only when needed:
 9. **postman** - API collection management (free tier for typical usage)
 10. **perplexity** - Paid, synthesized search + citations — explicit deep-research/high-stakes only
 11. **Apify** - Paid, usage-billed actor pipelines — verify real usage before relying on it
+12. **context7** - Free remote MCP — version-specific library/framework documentation (not general web search)
 
 ### Cost tiering (search / scrape)
 
@@ -36,6 +37,7 @@ self-hosted tool already covers:
 | Need | Default (free) | Escalate to (paid) only if |
 |---|---|---|
 | Routine web search / freshness check | `searxng` (preferred) or `duckduckgo` | — |
+| Official docs for a named library/framework (version-aware) | `context7` | — |
 | Synthesized answer + citations in one call | — | `perplexity`, user explicitly asked for deep research |
 | Multi-page crawl / structured extraction | `playwright` (manual) | `Apify`, and only after confirming real recurring need — self-hosting Firecrawl was evaluated and rejected for now (5 containers, ≥8GB RAM, disproportionate to current usage) |
 
@@ -88,6 +90,12 @@ See `skills/deep-research/SKILL.md` for the agent-facing tool-selection gate.
 - **Usage:** Create task plans for complex work, track execution and reflect on results, store project rules and conventions
 - **Environment variables:** `DATA_DIR`, `TEMPLATES_USE`, `ENABLE_GUI`, plus `MCP_PROMPT_*` variables for customization
 - **Docker image:** `mcp/shrimp` (built from `docker/mcp-shrimp/Dockerfile`)
+
+#### Context7
+- **Purpose:** Version-specific documentation and code examples for libraries/frameworks
+- **Usage:** When implementing against third-party APIs where training data may be stale; prompt with "use context7" or activate skill `mcp-context7-docs`. Not for general web search (use searxng/duckduckgo).
+- **Environment variables:** None required for anonymous use. Optional `CONTEXT7_API_KEY` via MCP server headers in Cursor Settings for higher rate limits ([context7.com/dashboard](https://context7.com/dashboard)).
+- **Connection:** URL-based — `https://mcp.context7.com/mcp` in `mcp.json` (no Docker container).
 
 ## Execution Model
 

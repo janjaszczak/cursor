@@ -135,6 +135,9 @@
     },
     "browseros": {
       "url": "http://127.0.0.1:9200/mcp"
+    },
+    "context7": {
+      "url": "https://mcp.context7.com/mcp"
     }
   }
 }

@@ -313,7 +313,7 @@ This directory contains:
 
 ### MCP Servers
 
-11 MCP servers are configured (see [mcp.md](mcp.md) for the full list and cost tiering):
+12 MCP servers are configured (see [mcp.md](mcp.md) for the full list and cost tiering):
 
 1. **memory** - Neo4j memory server (`mcp/memory`)
 2. **playwright** - Browser automation (`mcp/playwright`)
@@ -326,8 +326,9 @@ This directory contains:
 9. **postman** - API collections (`mcp/postman`)
 10. **perplexity** - Paid search+synthesis, explicit deep-research only (`mcp/perplexity-ask`)
 11. **Apify** - Paid scraping pipelines, hosted (URL-based)
+12. **context7** - Library docs lookup, hosted (URL-based, free tier)
 
-Most MCPs execute via Docker for cross-platform consistency (Windows and WSL); `browseros` and `Apify` connect via URL instead.
+Most MCPs execute via Docker for cross-platform consistency (Windows and WSL); `browseros`, `Apify`, and `context7` connect via URL instead.
 
 ### Rules
 
@@ -471,7 +472,7 @@ This sets all MCP environment variables in WSL (where MCPs actually run).
 
 - **Single source of truth**: Only user `.cursor/mcp.json` contains MCP definitions
 - **No duplicates**: Global configs are minimized (empty `mcpServers`)
-- **All MCPs working**: All 11 MCPs should be active
+- **All MCPs working**: All 12 MCPs should be active
 - **WSL accessible**: MCPs run via Docker (which runs in WSL)
 
 ## Chat history migration (after renaming project)

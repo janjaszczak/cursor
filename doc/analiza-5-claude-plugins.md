@@ -228,4 +228,14 @@ Code? — każde zweryfikowane web-search + istniejącymi plikami repo, nie z pa
 
 ## Wdrożono
 
-Nic — patrz sekcja 5. Ten dokument to tylko ocena przydatności.
+Wdrożono (branch `cursor/implement-context7-security-checklist`):
+
+- `mcp.json` — wpis `context7` (URL `https://mcp.context7.com/mcp`)
+- `skills/mcp-context7-docs/SKILL.md`
+- `README.md`, `doc/mcp.md`, `doc/configuration.md` — liczba serwerów 12, Context7 w tierze free/URL-based
+- `USER_RULES.txt` — wersja 3.9.0, `mcp-context7-docs` w SKILL CATALOG i ACTIVATION ROUTER
+- `agents/security-auditor.md` — checklista 8 kategorii wzorców podatności
+- `skills/high-risk-review/SKILL.md` — odnośnik do checklisty
+- `skills/plan-as-contract/SKILL.md` — krok clarify-before-plan
+
+Nie wdrożono (zgodnie z analizą): pluginy Claude Code, Claude Mem, Caveman, hook `guard-vulnerable-pattern-write.py`, git worktrees.

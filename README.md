@@ -54,7 +54,7 @@ All documentation is in the **[doc/](doc/)** directory:
 
 ## MCP Servers
 
-This configuration includes 11 servers. Free/self-hosted (no per-request cost) are preferred as defaults; paid APIs are kept as explicit escalation paths:
+This configuration includes 12 servers. Free/self-hosted (no per-request cost) are preferred as defaults; paid APIs are kept as explicit escalation paths:
 
 **Free / self-hosted (default tools):**
 - **memory** (Neo4j) - Persistent knowledge storage
@@ -65,6 +65,7 @@ This configuration includes 11 servers. Free/self-hosted (no per-request cost) a
 - **grafana** - Metrics and dashboards
 - **browseros** - Visible browser automation (user's own Chromium profile)
 - **shrimp-task-manager** - Task planning and execution
+- **context7** - Version-specific library documentation lookup (remote MCP, no API key required to start)
 
 **Paid APIs (use only when the free tools above are insufficient):**
 - **perplexity** - Synthesized search + citations in one call; use only for explicit deep-research/high-stakes requests
@@ -81,7 +82,7 @@ The `mcp.json` file is configured to work seamlessly in both Windows and WSL env
 - **Easy updates** - Pull latest images with `docker pull`
 - **Security** - All secrets via environment variables, never hardcoded
 
-**Docker-based:** memory, playwright, duckduckgo, searxng, grafana, github, shrimp-task-manager, postman, perplexity. **URL-based (no local container):** browseros (local BrowserOS), Apify (hosted).
+**Docker-based:** memory, playwright, duckduckgo, searxng, grafana, github, shrimp-task-manager, postman, perplexity. **URL-based (no local container):** browseros (local BrowserOS), Apify (hosted), context7 (hosted docs).
 
 ### Testing MCP Servers
 
