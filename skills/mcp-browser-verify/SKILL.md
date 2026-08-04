@@ -9,7 +9,8 @@ allowed-tools: MCP(*)
 
 ## Activation
 - UI bug, layout mismatch, flow verification, auth journey, “sprawdź w przeglądarce”.
-- Do **not** use when the user needs a visible browser, CAPTCHA/2FA intervention, or anti-bot in a real session — use `mcp-browseros` instead.
+- Prefer `mcp-browserclaw` when BrowserClaw is connected (logged-in agent browser + cockpit).
+- Do **not** use when the user needs CAPTCHA/2FA intervention or anti-bot in the **BrowserOS** human session — use `mcp-browseros` instead.
 
 ## Procedure
 1. Define scenario: URL, credentials (if any), steps, expected result.

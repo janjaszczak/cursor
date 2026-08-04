@@ -24,6 +24,7 @@ Use when any of these apply:
 
 Pick a different browser MCP (only one per task — see USER_RULES router):
 
+- Default agent web work with real logins / cockpit → `mcp-browserclaw` (prefer when BrowserClaw is connected)
 - Quick in-IDE webview check → cursor-ide-browser
 - Isolated, repeatable E2E / CI-style smoke → `mcp-playwright`
 - Generic UI verification with no specific tool preference → `mcp-browser-verify`

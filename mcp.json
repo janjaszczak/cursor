@@ -142,6 +142,10 @@
         "-c",
         "import os,runpy,sys; from pathlib import Path; c=[]; d=os.environ.get('CURSOR_CONFIG_DIR'); c+=[Path(d)/'scripts'/'mcp-run-context7.py'] if d else []; c+=[Path.home()/'.cursor'/'scripts'/'mcp-run-context7.py']; u=os.environ.get('USER') or os.environ.get('USERNAME'); c+=[Path(f'/mnt/c/Users/{u}/.cursor/scripts/mcp-run-context7.py')] if u else []; p=next((x for x in c if x.is_file()), None); sys.exit(f'mcp-run-context7.py not found; tried={c}') if p is None else runpy.run_path(str(p), run_name='__main__')"
       ]
+    },
+    "BrowserClaw": {
+      "url": "http://127.0.0.1:9010/mcp",
+      "type": "http"
     }
   }
 }
