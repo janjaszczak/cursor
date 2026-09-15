@@ -1,7 +1,7 @@
 ---
 name: mcp-github-ops
 description: Use GitHub MCP for issue/PR context, diffs, reviews, and automations. Use when the task references PR/issue numbers, review requests, or requires repo metadata beyond local git.
-compatibility: Requires GitHub MCP configured (token/env in mcp.json).
+compatibility: Requires GitHub MCP remote (`https://api.githubcopilot.com/mcp/`) with `${env:GITHUB_PERSONAL_ACCESS_TOKEN}`.
 allowed-tools: MCP(*) Bash(*)
 ---
 

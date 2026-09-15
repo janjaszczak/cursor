@@ -12,22 +12,23 @@ Skill KeePass: [`skills/keepass/SKILL.md`](../skills/keepass/SKILL.md) (`/keepas
 | **Source of truth** | `cursor.kdbx` (KeePass) | All API keys, tokens, host passwords |
 | **Runtime (local)** | `~/.cursor/.env` | Values MCP actually uses — **gitignored** |
 | **Template** | `.env.example` | Variable **names** and comments — safe to commit |
-| **Config (no secrets)** | `mcp.json` | Server definitions; `-e VAR_NAME` or Python launchers only |
+| **Config (no secrets)** | `mcp.json` | Server definitions; `-e VAR_NAME`, `${env:VAR}` headers, or Python launchers only |
 | **Keyring** | secret-tool / SecretStore | **Only** the KeePass **master** password for `cursor.kdbx` |
 
-**Never** commit real secrets to Git or put them in `mcp.json`. Cursor does **not** expand `${VAR}` or `$VAR` inside `mcp.json` `headers` — use `.env` + a launcher script instead (see Context7 below).
+**Never** commit real secrets to Git or put them in `mcp.json`. Cursor does **not** expand `${VAR}` or `$VAR` inside `mcp.json` `headers`. For remote MCP headers use **`${env:VAR}`** interpolation (GitHub official remote). Bare `${VAR}` / `$VAR` still need a launcher that reads `.env` (Context7).
 
 ---
 
 ## How secrets reach an MCP server
 
-Three patterns in this repo:
+Four patterns in this repo:
 
 | Pattern | MCP examples | What you maintain |
 |---------|----------------|-------------------|
-| **Docker `-e VAR`** | github, grafana, postman, perplexity | `VAR` in `.env` + optionally **User/shell env** via `setup-env-vars.*` so the Cursor process passes it into `docker run` |
+| **Remote `${env:VAR}` header** | github | `GITHUB_PERSONAL_ACCESS_TOKEN` in `.env` + **User/shell env** via `setup-env-vars.*` so Cursor interpolates `Bearer ${env:GITHUB_PERSONAL_ACCESS_TOKEN}` |
+| **Docker `-e VAR`** | grafana, postman, perplexity | `VAR` in `.env` + optionally **User/shell env** via `setup-env-vars.*` so the Cursor process passes it into `docker run` |
 | **Python launcher reads `.env`** | memory (`mcp-run-memory.py`), context7 (`mcp-run-context7.py`) | Only `~/.cursor/.env` — launcher loads it before starting the server |
-| **URL / no key in repo** | duckduckgo, searxng, browseros, shrimp | No API key, or host-only (Apify: configure token in Cursor MCP UI if needed) |
+| **URL / no key in repo** | duckduckgo, searxng, browseros, BrowserClaw, shrimp | No API key, or host-only (Apify: configure token in Cursor MCP UI if needed) |
 
 After any change to `.env` or `mcp.json`: **restart Cursor**.
 
@@ -82,7 +83,7 @@ CONTEXT7_API_KEY=<paste value from KeePass>
 GITHUB_PERSONAL_ACCESS_TOKEN=<…>
 ```
 
-For **Docker MCPs** (GitHub, Grafana, Postman, Perplexity), also run env sync if Cursor does not see variables:
+For **Docker MCPs** (Grafana, Postman, Perplexity) and the **GitHub remote** (`${env:GITHUB_PERSONAL_ACCESS_TOKEN}`), also run env sync if Cursor does not see variables:
 
 | Where Cursor runs | Command |
 |-------------------|---------|
@@ -120,7 +121,7 @@ Restart Cursor. For Context7, MCP list should show `context7`; a prompt with `us
 | Environment variable | MCP server | KeePass (example path) | Notes |
 |----------------------|------------|-------------------------|--------|
 | `NEO4J_USERNAME`, `NEO4J_PASSWORD`, `NEO4J_DATABASE` | memory | (your Neo4j creds) | Launcher; `NEO4J_URI` in `.env` is for host tools, not the container |
-| `GITHUB_PERSONAL_ACCESS_TOKEN` | github | `API Keys/GitHub` (if you use that layout) | Docker `-e` |
+| `GITHUB_PERSONAL_ACCESS_TOKEN` | github | `API Keys/GitHub` (if you use that layout) | Remote header `${env:GITHUB_PERSONAL_ACCESS_TOKEN}` |
 | `GRAFANA_URL`, `GRAFANA_API_KEY` | grafana | | Docker `-e` |
 | `POSTMAN_API_KEY` | postman | | Docker `-e` |
 | `PERPLEXITY_API_KEY` | perplexity | | Paid escalation only — see [mcp.md § Cost tiering](mcp.md#cost-tiering-search--scrape) |
@@ -138,9 +139,10 @@ Add a new row here when you introduce a new `-e` in `mcp.json` or a new launcher
 | `Could not find entry with path …` | Wrong KeePass path | `keepassxc-cli search` → use `Group/Title` without leading `/` |
 | MCP works in WSL but not Windows | `.env` or User env only on one side | Sync `.env`; run `setup-env-vars.ps1` on Windows |
 | Context7: `CONTEXT7_API_KEY is not set` | Missing or placeholder in `.env` | Step 4 above; restart Cursor |
-| GitHub/Grafana MCP auth errors | Docker `-e` empty in Cursor process | `setup-env-vars.*`; restart Cursor |
+| GitHub MCP auth errors | `${env:GITHUB_PERSONAL_ACCESS_TOKEN}` empty in Cursor process | `setup-env-vars.*`; restart Cursor; never paste a PAT into `mcp.json` |
+| Grafana/Postman/Perplexity auth errors | Docker `-e` empty in Cursor process | `setup-env-vars.*`; restart Cursor |
 | Secret in KeePass UI under “Cursor / API Keys” | Group may still be `API Keys` at DB root | Trust **`search`**, not the folder label in KeePassXC |
-| Tempted to put key in `mcp.json` `headers` | Cursor won’t substitute env vars | Use `.env` + launcher pattern like context7 |
+| Tempted to put a raw PAT in `mcp.json` `headers` | Secrets must stay out of git | Use `${env:VAR}` (GitHub) or `.env` + launcher (Context7). Do **not** use `${VAR}` / `$VAR` |
 
 Hooks block **writing** secrets into tracked files ([`doc/hooks.md`](hooks.md)); editing `.env` manually or via approved flow is expected.
 

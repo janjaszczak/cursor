@@ -49,22 +49,23 @@ All documentation is in the **[doc/](doc/)** directory:
 
 - **Single source of truth**: All Cursor config in `.cursor/` directory
 - **Cross-platform**: Works on Windows and WSL with same configuration
-- **MCP servers**: All MCPs run in Docker containers for cross-platform consistency
+- **MCP servers**: Mixed transports — Docker (free/self-hosted + leftover catalog images), Python launchers, and remote Streamable HTTP. Not all MCPs run in Docker.
 - **Git**: Use `git pull` / `git push` or your preferred method to sync configuration across machines
 - **Secure**: Secrets in environment variables, not in config files
 
 ## MCP Servers
 
-This configuration includes 12 servers. Free/self-hosted (no per-request cost) are preferred as defaults; paid APIs are kept as explicit escalation paths:
+This configuration includes 13 servers. Free/self-hosted (no per-request cost) are preferred as defaults; paid APIs are kept as explicit escalation paths:
 
 **Free / self-hosted (default tools):**
 - **memory** (Neo4j) - Persistent knowledge storage
 - **playwright** - Browser automation
 - **duckduckgo** - Web search (keyless)
 - **searxng** - Web search, aggregated engines (self-hosted, see [docker/mcp-searxng](docker/mcp-searxng/README.md)) — preferred over duckduckgo for routine search
-- **github** - GitHub repository operations
+- **github** - GitHub repository operations (official remote Streamable HTTP)
 - **grafana** - Metrics and dashboards
 - **browseros** - Visible browser automation (user's own Chromium profile)
+- **BrowserClaw** - Local HTTP MCP for agent web work
 - **shrimp-task-manager** - Task planning and execution
 - **context7** - Version-specific library documentation lookup (`mcp-run-context7.py` + `CONTEXT7_API_KEY` in `.env`)
 
@@ -77,13 +78,16 @@ See [doc/configuration.md](doc/configuration.md) for detailed setup instructions
 
 ### Cross-Platform Configuration
 
-The `mcp.json` file is configured to work seamlessly in both Windows and WSL environments. Most MCP servers use Docker containers (from the [Docker Hub MCP Catalog](https://hub.docker.com/mcp) or custom `docker/mcp-*` builds), providing:
-- **Consistent execution** - Same behavior on Windows and WSL
-- **Isolation** - Each server runs in its own container
-- **Easy updates** - Pull latest images with `docker pull`
-- **Security** - All secrets via environment variables, never hardcoded
+The `mcp.json` file is configured to work seamlessly in both Windows and WSL environments. Transports are mixed (not Docker-only):
 
-**Docker-based:** memory, playwright, duckduckgo, searxng, grafana, github, shrimp-task-manager, postman, perplexity. **URL-based (no local container):** browseros (local BrowserOS), Apify (hosted). **Launcher (stdio, reads `.env`):** context7 (`@upstash/context7-mcp` via `mcp-run-context7.py`).
+- **Docker** — isolation and the same image on Windows/WSL for leftover catalog servers and intentional free/self-hosted search
+- **Remote Streamable HTTP** — official hosted endpoints (no local container)
+- **Python launchers** — stdio wrappers that read `~/.cursor/.env`
+- **Security** — secrets via environment variables / `${env:…}` interpolation, never hardcoded
+
+**Docker-based:** playwright, duckduckgo, searxng, grafana, shrimp-task-manager, postman, perplexity. **Docker under a launcher (not the mcp.json command):** memory (Neo4j). **Remote/URL:** github (`https://api.githubcopilot.com/mcp/`), browseros, BrowserClaw, Apify. **Launcher (stdio, reads `.env`):** context7 (`@upstash/context7-mcp` via `mcp-run-context7.py`).
+
+Cost-tiering is unchanged: prefer free `searxng` / `duckduckgo` for routine search; escalate to paid `perplexity` / `Apify` only when needed. See [doc/mcp.md](doc/mcp.md#leftover-docker-mcp-audit-eur-280).
 
 ### Testing MCP Servers
 
@@ -92,12 +96,13 @@ Test all MCP servers with:
 - **WSL**: `./scripts/test-mcp-servers.sh`
 
 This verifies:
-- Docker availability and image presence
+- Docker availability and image presence (for Docker-backed entries)
+- Remote/URL entries (including official GitHub MCP)
 - Security (no hardcoded secrets)
 - Environment variable configuration
 - Server health checks
 
-See [doc/mcp.md](doc/mcp.md) for complete MCP documentation including Docker management.
+See [doc/mcp.md](doc/mcp.md) for complete MCP documentation including Docker management and leftover audit.
 
 ## Understanding Duplicates
 

@@ -1,13 +1,12 @@
 # Script to build Docker images for MCP servers
 # Builds custom Docker images for servers that don't have official images
 #
-# Usage: .\scripts\build-mcp-images.ps1 [--all] [--memory] [--duckduckgo]
+# Usage: .\scripts\build-mcp-images.ps1 [--all] [--memory] [--duckduckgo] [--shrimp]
 
 param(
     [switch]$All,
     [switch]$Memory,
     [switch]$DuckDuckGo,
-    [switch]$GitHub,
     [switch]$Shrimp
 )
 
@@ -64,25 +63,6 @@ if ($All -or $DuckDuckGo) {
     }
 }
 
-# Build github image
-if ($All -or $GitHub) {
-    $githubDir = Join-Path $dockerDir "mcp-github"
-    if (Test-Path $githubDir) {
-        Write-Host "Building mcp/github..." -ForegroundColor Yellow
-        try {
-            docker build -t mcp/github:latest $githubDir
-            if ($LASTEXITCODE -eq 0) {
-                Write-Host "  [OK] mcp/github built successfully" -ForegroundColor Green
-                $builtImages += "mcp/github:latest"
-            } else {
-                Write-Error "Failed to build mcp/github"
-            }
-        } catch {
-            Write-Error "Error building mcp/github: $_"
-        }
-    }
-}
-
 # Build shrimp image
 if ($All -or $Shrimp) {
     $shrimpDir = Join-Path $dockerDir "mcp-shrimp"
@@ -109,7 +89,7 @@ foreach ($img in $builtImages) {
 }
 
 if ($builtImages.Count -eq 0) {
-    Write-Host "`nNo images were built. Use --all, --memory, --duckduckgo, --github, or --shrimp flags." -ForegroundColor Yellow
+    Write-Host "`nNo images were built. Use --all, --memory, --duckduckgo, or --shrimp flags." -ForegroundColor Yellow
     exit 1
 }
 

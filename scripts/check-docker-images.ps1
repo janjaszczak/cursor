@@ -11,7 +11,6 @@ Write-Host ""
 # List of MCP servers to check
 $mcpServers = @(
     @{ Name = "grafana"; Image = "mcp/grafana"; AltImage = ""; Required = $true },
-    @{ Name = "github"; Image = "mcp/github"; AltImage = ""; Required = $true },
     @{ Name = "playwright"; Image = "mcp/playwright"; AltImage = ""; Required = $true },
     @{ Name = "duckduckgo"; Image = "mcp/duckduckgo"; AltImage = ""; Required = $true },
     @{ Name = "searxng"; Image = "isokoliuk/mcp-searxng"; AltImage = ""; Required = $true },

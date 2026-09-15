@@ -1,10 +1,18 @@
 # MCP (Model Context Protocol) Configuration
 
-This document describes the MCP server setup, usage, Docker management, and troubleshooting for this project.
+This document describes the MCP server setup, usage, Docker management, leftover Docker audit, and troubleshooting for this project.
 
 ## Overview
 
-All MCP servers run in **Docker containers** for cross-platform consistency (Windows and WSL). Images are available from the [Docker Hub MCP Catalog](https://hub.docker.com/mcp) or built from custom Dockerfiles.
+MCP servers in this repo use **mixed transports**. They are **not** Docker-only:
+
+| Transport | Examples |
+|-----------|----------|
+| **Remote Streamable HTTP** | `github` (`https://api.githubcopilot.com/mcp/`), `Apify`, `browseros`, `BrowserClaw` |
+| **Python launcher (stdio)** | `memory` (Neo4j still Docker underneath), `context7` |
+| **Docker stdio** | `playwright`, `duckduckgo`, `searxng`, `grafana`, `shrimp-task-manager`, `postman`, `perplexity` |
+
+Docker remains the right fit for **intentional free/self-hosted** search (`searxng`, `duckduckgo`) and for leftover catalog images that have not been migrated yet. Official images come from the [Docker Hub MCP Catalog](https://hub.docker.com/mcp) or custom `docker/mcp-*` Dockerfiles.
 
 ## Configuration File
 
@@ -12,14 +20,14 @@ MCP servers are configured in `.cursor/mcp.json`. This file contains **no secret
 
 ## MCP Servers
 
-12 MCP servers are configured. Search/scrape tooling is tiered by cost —
+13 MCP servers are configured. Search/scrape tooling is tiered by cost —
 default to free/self-hosted, escalate to paid APIs only when needed:
 
 1. **memory** (Neo4j) - Persistent knowledge storage in Neo4j graph database
 2. **playwright** - Browser automation and web page interaction
 3. **duckduckgo** - External web search, keyless (free)
 4. **searxng** - External web search, self-hosted aggregated engines (free) — preferred default over duckduckgo, see [Cost tiering](#cost-tiering-search--scrape)
-5. **github** - GitHub repository operations and management
+5. **github** - GitHub repository operations (official remote Streamable HTTP; not Docker)
 6. **grafana** - Metrics, logs, and dashboards for debugging and performance
 7. **browseros** - Visible browser automation on the user's own Chromium profile (CAPTCHA/2FA/OAuth)
 8. **shrimp-task-manager** - Task planning, execution, and reflection
@@ -27,6 +35,7 @@ default to free/self-hosted, escalate to paid APIs only when needed:
 10. **perplexity** - Paid, synthesized search + citations — explicit deep-research/high-stakes only
 11. **Apify** - Paid, usage-billed actor pipelines — verify real usage before relying on it
 12. **context7** - Free remote MCP — version-specific library/framework documentation (not general web search)
+13. **BrowserClaw** - Local HTTP MCP for agent web work (`http://127.0.0.1:9010/mcp`)
 
 ### Cost tiering (search / scrape)
 
@@ -42,6 +51,24 @@ self-hosted tool already covers:
 | Multi-page crawl / structured extraction | `playwright` (manual) | `Apify`, and only after confirming real recurring need — self-hosting Firecrawl was evaluated and rejected for now (5 containers, ≥8GB RAM, disproportionate to current usage) |
 
 See `skills/deep-research/SKILL.md` for the agent-facing tool-selection gate.
+
+### Leftover Docker MCP audit ([EUR-280](https://linear.app/eureka-labs/issue/EUR-280/poc-cursor-mcp-dockerremote-github-first-audyt-leftover))
+
+GitHub moved to official remote in this change. Remaining Docker-backed entries:
+
+| Server | Verdict | Why |
+|--------|---------|-----|
+| **playwright** | **MIGRATE** (later) | Official Playwright MCP can run via `npx` / local Chromium; Docker still works. No local `docker/mcp-playwright` folder. |
+| **duckduckgo** | **KEEP** | Intentional free/keyless search tier. Local fallback Dockerfile stays (`docker/mcp-duckduckgo/`). |
+| **searxng** | **KEEP** | Intentional free/self-hosted preferred search. Engine + wrapper still need Docker. |
+| **grafana** | **MIGRATE** (later) | Official Grafana Cloud remote exists (`https://mcp.grafana.com/mcp`) but this repo points at **self-hosted** `GRAFANA_URL=http://localhost:3001`. Cloud remote is not a drop-in. Next step: official OSS `uvx mcp-grafana` **or** Cloud remote if the stack moves off localhost. |
+| **shrimp-task-manager** | **KEEP** | Local task store in Docker volume `shrimp_data`; no official remote. Custom `docker/mcp-shrimp/` still required. |
+| **postman** | **MIGRATE** (later) | Official remote exists (`https://mcp.postman.com/mcp` full mode). Docker `--full` can be replaced without losing the free-tier API-collection use case. |
+| **perplexity** | **MIGRATE** (later) | Official hosted MCP exists; keep as **paid escalation only** (cost tiering unchanged). |
+| **memory** | **KEEP** (this PR) | Neo4j stays Docker under the Python launcher. **Out of scope** — do not migrate memory/Neo4j here. |
+| **github** (done) | **KILL** Docker leftover | Official remote `https://api.githubcopilot.com/mcp/` + `Bearer ${env:GITHUB_PERSONAL_ACCESS_TOKEN}`. Local `docker/mcp-github/` and `--github` build targets removed. |
+
+**Do not** remove `searxng` / `duckduckgo` without strong evidence they are unused. Cost-tiering depends on them remaining the default free search path.
 
 ### Server Details
 
@@ -76,8 +103,9 @@ See `skills/deep-research/SKILL.md` for the agent-facing tool-selection gate.
 #### GitHub
 - **Purpose:** GitHub repository operations
 - **Usage:** Inspect and modify remote repositories (only when explicitly asked). Never perform destructive operations without explicit confirmation.
-- **Environment variables:** `GITHUB_PERSONAL_ACCESS_TOKEN`
-- **Docker image:** `mcp/github`
+- **Environment variables:** `GITHUB_PERSONAL_ACCESS_TOKEN` (Cursor process env / `.env`; interpolated as `${env:GITHUB_PERSONAL_ACCESS_TOKEN}` — never hardcode the PAT)
+- **Connection:** Official remote Streamable HTTP `https://api.githubcopilot.com/mcp/` ([install guide](https://github.com/github/github-mcp-server/blob/main/docs/installation-guides/install-cursor.md)). Requires Cursor v0.48.0+.
+- **Not Docker:** local `docker/mcp-github/` and `mcp/github` image are removed.
 
 #### Grafana
 - **Purpose:** Metrics and dashboards
@@ -99,7 +127,9 @@ See `skills/deep-research/SKILL.md` for the agent-facing tool-selection gate.
 
 ## Execution Model
 
-All MCP servers use Docker containers with this pattern:
+Transports are mixed. Docker stdio is only one of them.
+
+**Docker (leftover catalog + intentional self-hosted):**
 
 ```json
 {
@@ -115,20 +145,32 @@ All MCP servers use Docker containers with this pattern:
 }
 ```
 
+**Remote Streamable HTTP (GitHub):**
+
+```json
+{
+  "url": "https://api.githubcopilot.com/mcp/",
+  "headers": {
+    "Authorization": "Bearer ${env:GITHUB_PERSONAL_ACCESS_TOKEN}"
+  }
+}
+```
+
+`${env:NAME}` is Cursor / VS Code interpolation. Do **not** put a raw PAT in `mcp.json`. `${VAR}` / `$VAR` are **not** expanded — use `${env:VAR}` for remote headers, or a launcher that reads `.env`.
 
 **Exception — DuckDuckGo:** the Hub image has no `ENTRYPOINT`. Do not append `--transport=stdio` (or any args) after the image name; they replace `CMD` and the container fails to start.
 
-**Benefits:**
-- Consistent execution across Windows and WSL
-- Isolation - each server runs in its own container
-- Easy updates - pull latest images with `docker pull`
-- Security - all secrets via environment variables
+**Benefits of each transport:**
+- **Remote** — no image pull / cold start; vendor hosts the server (GitHub, Apify)
+- **Docker** — same image on Windows and WSL; isolation; required for self-hosted `searxng` / Neo4j
+- **Launcher** — reads `~/.cursor/.env` without relying on Docker `-e` from the Cursor process
+- **Security** — all secrets via environment variables / `${env:…}` interpolation
 
 ## Environment Variables
 
 Secrets and API keys: **[mcp-secrets.md](mcp-secrets.md)** (KeePass → `.env`, verify, troubleshooting).
 
-**IMPORTANT:** Docker MCPs need variables in the **Cursor process environment** (often via `setup-env-vars.*` after editing `.env`). Launchers **memory** and **context7** read `~/.cursor/.env` directly.
+**IMPORTANT:** Docker MCPs and the GitHub remote (`${env:GITHUB_PERSONAL_ACCESS_TOKEN}`) need variables in the **Cursor process environment** (often via `setup-env-vars.*` after editing `.env`). Launchers **memory** and **context7** read `~/.cursor/.env` directly.
 
 **Common variables:** `NEO4J_*`, `GITHUB_PERSONAL_ACCESS_TOKEN`, `GRAFANA_URL`, `GRAFANA_API_KEY`, `POSTMAN_API_KEY`, `PERPLEXITY_API_KEY`, `CONTEXT7_API_KEY` — see [`.env.example`](../.env.example).
 
@@ -142,7 +184,6 @@ Full setup: [configuration.md](configuration.md).
 - **mcp/playwright** - Playwright browser automation
 - **mcp/duckduckgo** - DuckDuckGo web search
 - **mcp/neo4j-memory** - Neo4j Memory MCP server
-- **mcp/github** - GitHub MCP server
 
 ### Public Community Images (no custom Dockerfile needed)
 
@@ -154,7 +195,6 @@ Full setup: [configuration.md](configuration.md).
 Custom Dockerfiles are available in `docker/mcp-*/`:
 - `docker/mcp-memory/` - Neo4j Memory MCP Server (if not available on Docker Hub)
 - `docker/mcp-duckduckgo/` - DuckDuckGo MCP Server (if not available on Docker Hub)
-- `docker/mcp-github/` - GitHub MCP Server
 - `docker/mcp-shrimp/` - Shrimp Task Manager (clones and builds from GitHub)
 - `docker/mcp-searxng/` - **Not a build recipe** — holds `settings.yml` config mounted into the public `searxng/searxng` engine image, plus setup docs (see [docker/mcp-searxng/README.md](../docker/mcp-searxng/README.md))
 
@@ -180,7 +220,6 @@ docker pull mcp/playwright
 docker pull mcp/duckduckgo
 docker pull mcp/neo4j-memory
 docker pull neo4j:latest
-docker pull mcp/github
 docker pull isokoliuk/mcp-searxng
 docker pull searxng/searxng
 ```
@@ -201,7 +240,6 @@ Or build individual images:
 ```bash
 .\scripts\build-mcp-images.ps1 --memory
 .\scripts\build-mcp-images.ps1 --duckduckgo
-.\scripts\build-mcp-images.ps1 --github
 .\scripts\build-mcp-images.ps1 --shrimp
 ```
 
@@ -234,8 +272,9 @@ Test all MCP servers with:
 - **WSL**: `./scripts/test-mcp-servers.sh`
 
 Tests verify:
-- Docker availability
+- Docker availability (for Docker-backed entries)
 - Image presence (local or Docker Hub)
+- Remote/URL entries (GitHub official endpoint + env interpolation)
 - Security (no hardcoded secrets)
 - Environment variable configuration
 - Server health
@@ -283,8 +322,8 @@ If using volume mounts (not recommended for cross-platform):
 - **Secrets in `.env`** - not committed (rotate regularly)
 - **KeePass integration** - recommended for production secret management
 - **Never hardcode secrets** in `mcp.json`
-- **Use environment variables** for all sensitive data (`-e VAR_NAME`)
-- **Set variables in WSL** where Docker runs
+- **Use environment variables** for all sensitive data (`-e VAR_NAME` or `${env:VAR_NAME}` on remotes)
+- **Set variables in the Cursor process** (User env / WSL profile) so Docker `-e` and remote `${env:…}` resolve
 - **Rotate secrets regularly**
 
 ## Version Management
@@ -295,7 +334,7 @@ If using volume mounts (not recommended for cross-platform):
 | playwright | `mcp/playwright` (Docker) | `docker pull mcp/playwright` |
 | duckduckgo | `mcp/duckduckgo` (Docker) | `docker pull mcp/duckduckgo` |
 | searxng | `isokoliuk/mcp-searxng` + `searxng/searxng` (Docker) | `docker pull isokoliuk/mcp-searxng && docker pull searxng/searxng`, then re-run `scripts/start-searxng.sh` |
-| github | `mcp/github` (Docker) | `docker pull mcp/github` |
+| github | official remote `https://api.githubcopilot.com/mcp/` | hosted; keep `GITHUB_PERSONAL_ACCESS_TOKEN` in `.env` |
 | grafana | `mcp/grafana` (Docker) | `docker pull mcp/grafana` |
 | shrimp-task-manager | `mcp/shrimp` (Docker, built from GitHub) | Rebuild from source |
 
