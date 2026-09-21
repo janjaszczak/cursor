@@ -73,7 +73,7 @@ After setting, restart Cursor for changes to take effect.
 
 Summary:
 
-**IMPORTANT:** Docker MCPs receive variables from **the environment of the Cursor process**. Launchers (**memory**, **context7**) read **`~/.cursor/.env`** directly (see [mcp-secrets.md](mcp-secrets.md)).
+**IMPORTANT:** Docker MCPs and the GitHub remote (`${env:GITHUB_PERSONAL_ACCESS_TOKEN}`) receive variables from **the environment of the Cursor process**. Launchers (**memory**, **context7**) read **`~/.cursor/.env`** directly (see [mcp-secrets.md](mcp-secrets.md)).
 
 **Variables (see [`.env.example`](../.env.example)):**
 
@@ -289,7 +289,7 @@ Available utility scripts:
 - `check-docker-images.{ps1,sh}` - Check Docker image availability
 - `analyze-mcp-usage.{ps1,sh}` - Analyze MCP server usage
 
-**Note:** Legacy MCP wrapper scripts have been archived. All MCP servers now use Docker for cross-platform consistency.
+**Note:** Legacy MCP wrapper scripts have been archived. Remaining Docker MCPs are leftover catalog images plus intentional self-hosted search/memory. GitHub is official remote Streamable HTTP, not Docker.
 
 ## Current Setup
 
@@ -325,22 +325,23 @@ This directory contains:
 
 ### MCP Servers
 
-12 MCP servers are configured (see [mcp.md](mcp.md) for the full list and cost tiering):
+13 MCP servers are configured (see [mcp.md](mcp.md) for the full list, cost tiering, and leftover Docker audit):
 
-1. **memory** - Neo4j memory server (`mcp/memory`)
-2. **playwright** - Browser automation (`mcp/playwright`)
-3. **duckduckgo** - Web search, free (`mcp/duckduckgo`)
-4. **searxng** - Web search, free, preferred default (`isokoliuk/mcp-searxng` + `searxng/searxng`, requires one-time `./scripts/start-searxng.sh`)
-5. **github** - GitHub operations (`mcp/github`)
-6. **grafana** - Metrics/dashboards (`mcp/grafana`)
+1. **memory** - Neo4j memory server (Python launcher; Neo4j still Docker)
+2. **playwright** - Browser automation (`mcp/playwright`, Docker)
+3. **duckduckgo** - Web search, free (`mcp/duckduckgo`, Docker — KEEP)
+4. **searxng** - Web search, free, preferred default (`isokoliuk/mcp-searxng` + `searxng/searxng`, requires one-time `./scripts/start-searxng.sh` — KEEP)
+5. **github** - GitHub operations (official remote `https://api.githubcopilot.com/mcp/` + `${env:GITHUB_PERSONAL_ACCESS_TOKEN}`)
+6. **grafana** - Metrics/dashboards (`mcp/grafana`, Docker — MIGRATE later)
 7. **browseros** - Visible browser automation (local BrowserOS, URL-based)
-8. **shrimp-task-manager** - Task planning (`mcp/shrimp`, built from GitHub)
-9. **postman** - API collections (`mcp/postman`)
-10. **perplexity** - Paid search+synthesis, explicit deep-research only (`mcp/perplexity-ask`)
+8. **shrimp-task-manager** - Task planning (`mcp/shrimp`, built from GitHub — KEEP)
+9. **postman** - API collections (`mcp/postman`, Docker — MIGRATE later)
+10. **perplexity** - Paid search+synthesis, explicit deep-research only (`mcp/perplexity-ask`, Docker — MIGRATE later)
 11. **Apify** - Paid scraping pipelines, hosted (URL-based)
-12. **context7** - Library docs lookup, hosted (URL-based, free tier)
+12. **context7** - Library docs lookup (Python launcher + `@upstash/context7-mcp`)
+13. **BrowserClaw** - Local HTTP MCP (`http://127.0.0.1:9010/mcp`)
 
-Most MCPs execute via Docker for cross-platform consistency (Windows and WSL); `browseros`, `Apify`, and `context7` connect via URL instead.
+Transports are mixed: Docker for leftover catalog images and intentional self-hosted search/memory; remote/URL for `github`, `browseros`, `BrowserClaw`, and `Apify`; launchers for `memory` and `context7`.
 
 ### Rules
 
@@ -487,8 +488,8 @@ This sets all MCP environment variables in WSL (where MCPs actually run).
 
 - **Single source of truth**: Only user `.cursor/mcp.json` contains MCP definitions
 - **No duplicates**: Global configs are minimized (empty `mcpServers`)
-- **All MCPs working**: All 12 MCPs should be active
-- **WSL accessible**: MCPs run via Docker (which runs in WSL)
+- **All MCPs working**: All 13 MCPs should be active
+- **WSL accessible**: Docker-backed MCPs still run via Docker (WSL); GitHub and other remotes use HTTP from the Cursor process
 
 ## Chat history migration (after renaming project)
 

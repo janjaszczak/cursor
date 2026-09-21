@@ -1,5 +1,5 @@
 ﻿# Script to test MCP servers - health check, functional, performance, and security tests
-# Verifies that all MCP servers work correctly with Docker
+# Verifies Docker, launcher, and remote/URL MCP entries in mcp.json
 #
 # Usage: .\scripts\test-mcp-servers.ps1
 
@@ -32,9 +32,15 @@ $secretPatterns = @(
 )
 
 $securityIssues = @()
-foreach ($pattern in $secretPatterns) {
-    if ($mcpContent -match $pattern) {
-        $securityIssues += "Potential secret found matching pattern: $pattern"
+$mcpLines = Get-Content $mcpConfigPath
+foreach ($line in $mcpLines) {
+    if ($line -match '\$\{env:') {
+        continue
+    }
+    foreach ($pattern in $secretPatterns) {
+        if ($line -match $pattern) {
+            $securityIssues += "Potential secret found matching pattern: $pattern"
+        }
     }
 }
 
@@ -50,7 +56,7 @@ if ($securityIssues.Count -eq 0) {
     $errors += "Security check failed"
 }
 
-# Config contract checks (DDG + Memory)
+# Config contract checks (DDG + Memory + GitHub remote)
 Write-Host "`nConfig contract checks..." -ForegroundColor Yellow
 $ddg = $mcpConfig.mcpServers.duckduckgo
 if ($ddg -and $ddg.command -eq "docker") {
@@ -88,6 +94,33 @@ if ($mem -and $mem.command -eq "python" -and $memArgs -match "mcp-run-memory\.py
     Write-Host "  [ERROR] memory must use launcher or NEO4J_URL" -ForegroundColor Red
     $testResults += @{ Server = "memory"; Test = "Launcher"; Status = "FAIL" }
     $errors += "memory: expected mcp-run-memory.py launcher or NEO4J_URL"
+}
+
+$gh = $mcpConfig.mcpServers.github
+$ghUrl = if ($gh) { [string]$gh.url } else { "" }
+$ghAuth = ""
+if ($gh -and $gh.headers) {
+    $ghAuth = [string]$gh.headers.Authorization
+}
+if ($gh -and $gh.command -eq "docker") {
+    Write-Host "  [ERROR] github must be official remote, not docker mcp/github" -ForegroundColor Red
+    $testResults += @{ Server = "github"; Test = "Remote"; Status = "FAIL" }
+    $errors += "github: docker leftover"
+} elseif ($ghUrl -ne "https://api.githubcopilot.com/mcp/") {
+    Write-Host "  [ERROR] github must use https://api.githubcopilot.com/mcp/" -ForegroundColor Red
+    $testResults += @{ Server = "github"; Test = "Remote"; Status = "FAIL" }
+    $errors += "github: unexpected remote URL"
+} elseif ($ghAuth -notlike '*${env:GITHUB_PERSONAL_ACCESS_TOKEN}*') {
+    Write-Host "  [ERROR] github must interpolate `${env:GITHUB_PERSONAL_ACCESS_TOKEN} (no hardcoded token)" -ForegroundColor Red
+    $testResults += @{ Server = "github"; Test = "Remote"; Status = "FAIL" }
+    $errors += "github: missing env interpolation"
+} elseif ($ghAuth -match 'ghp_|github_pat_') {
+    Write-Host "  [ERROR] github Authorization must not contain a hardcoded PAT" -ForegroundColor Red
+    $testResults += @{ Server = "github"; Test = "Remote"; Status = "FAIL" }
+    $errors += "github: hardcoded PAT"
+} else {
+    Write-Host "  [OK] github uses official remote + env interpolation" -ForegroundColor Green
+    $testResults += @{ Server = "github"; Test = "Remote"; Status = "PASS" }
 }
 
 # Test each server
@@ -211,6 +244,9 @@ foreach ($serverName in $servers) {
             Write-Host "  [OK] Image exists locally: $memImg" -ForegroundColor Green
             $testResults += @{ Server = $serverName; Test = "Image Exists"; Status = "PASS"; Image = $memImg }
         }
+    } elseif ($server.url) {
+        Write-Host "  [OK] Remote/URL MCP: $($server.url)" -ForegroundColor Green
+        $testResults += @{ Server = $serverName; Test = "Remote URL"; Status = "PASS"; Message = [string]$server.url }
     } else {
         Write-Host "  [WARN] Unknown command: $command" -ForegroundColor Yellow
         $testResults += @{ Server = $serverName; Test = "Command Check"; Status = "WARN"; Message = "Unknown command: $command" }

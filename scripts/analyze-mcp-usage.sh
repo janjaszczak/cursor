@@ -68,10 +68,15 @@ try:
     
     for name, server in config.get('mcpServers', {}).items():
         command = server.get('command', '')
+        url = server.get('url', '')
         if command == 'docker':
             print(f"  ✓ {name} uses Docker")
+        elif command == 'python':
+            print(f"  ✓ {name} uses Python launcher")
+        elif url:
+            print(f"  ✓ {name} uses remote/URL ({url})")
         else:
-            print(f"  ⚠ {name} uses unexpected command: {command} (expected: docker)")
+            print(f"  ⚠ {name} uses unexpected command: {command or '(empty)'}")
 except Exception as e:
     pass
 PYEOF

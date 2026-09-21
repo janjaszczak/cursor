@@ -2,7 +2,7 @@
 # Script to build Docker images for MCP servers
 # Builds custom Docker images for servers that don't have official images
 #
-# Usage: ./scripts/build-mcp-images.sh [--all] [--memory] [--duckduckgo]
+# Usage: ./scripts/build-mcp-images.sh [--all] [--memory] [--duckduckgo] [--shrimp]
 
 set -e
 
@@ -24,7 +24,6 @@ built_images=()
 build_all=false
 build_memory=false
 build_duckduckgo=false
-build_github=false
 build_shrimp=false
 
 for arg in "$@"; do
@@ -38,9 +37,6 @@ for arg in "$@"; do
         --duckduckgo)
             build_duckduckgo=true
             ;;
-        --github)
-            build_github=true
-            ;;
         --shrimp)
             build_shrimp=true
             ;;
@@ -48,7 +44,7 @@ for arg in "$@"; do
 done
 
 # If no specific flags, build all
-if [ "$build_all" = false ] && [ "$build_memory" = false ] && [ "$build_duckduckgo" = false ] && [ "$build_github" = false ] && [ "$build_shrimp" = false ]; then
+if [ "$build_all" = false ] && [ "$build_memory" = false ] && [ "$build_duckduckgo" = false ] && [ "$build_shrimp" = false ]; then
     build_all=true
 fi
 
@@ -82,21 +78,6 @@ if [ "$build_all" = true ] || [ "$build_duckduckgo" = true ]; then
     fi
 fi
 
-# Build github image
-if [ "$build_all" = true ] || [ "$build_github" = true ]; then
-    github_dir="$docker_dir/mcp-github"
-    if [ -d "$github_dir" ]; then
-        echo "Building mcp/github..."
-        if docker build -t mcp/github:latest "$github_dir"; then
-            echo "  ✓ mcp/github built successfully"
-            built_images+=("mcp/github:latest")
-        else
-            echo "  ✗ Failed to build mcp/github" >&2
-            exit 1
-        fi
-    fi
-fi
-
 # Build shrimp image
 if [ "$build_all" = true ] || [ "$build_shrimp" = true ]; then
     shrimp_dir="$docker_dir/mcp-shrimp"
@@ -121,7 +102,7 @@ done
 
 if [ ${#built_images[@]} -eq 0 ]; then
     echo ""
-    echo "No images were built. Use --all, --memory, --duckduckgo, --github, or --shrimp flags." >&2
+    echo "No images were built. Use --all, --memory, --duckduckgo, or --shrimp flags." >&2
     exit 1
 fi
 

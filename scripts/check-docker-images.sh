@@ -13,7 +13,6 @@ echo ""
 # List of MCP servers to check
 declare -a servers=(
     "grafana:mcp/grafana:"
-    "github:mcp/github:"
     "playwright:mcp/playwright:"
     "duckduckgo:mcp/duckduckgo:"
     "searxng:isokoliuk/mcp-searxng:"

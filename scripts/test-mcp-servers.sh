@@ -1,6 +1,6 @@
 #!/bin/bash
 # Script to test MCP servers - health check, functional, performance, and security tests
-# Verifies that all MCP servers work correctly with Docker
+# Verifies Docker, launcher, and remote/URL MCP entries in mcp.json
 #
 # Usage: ./scripts/test-mcp-servers.sh
 
@@ -52,7 +52,7 @@ except Exception as e:
 PYEOF
 )
 
-# Config contract checks (DDG + Memory)
+# Config contract checks (DDG + Memory + GitHub remote)
 echo ""
 echo "Config contract checks..."
 py_cmd="python3"
@@ -86,6 +86,23 @@ elif "NEO4J_URL=" in joined:
 else:
     print("  ✗ memory must use launcher or NEO4J_URL")
     errors.append("memory:launcher")
+gh = servers.get("github", {})
+gh_url = gh.get("url") or ""
+gh_auth = (gh.get("headers") or {}).get("Authorization") or ""
+if gh.get("command") == "docker" or "mcp/github" in str(gh.get("args") or []):
+    print("  ✗ github must be official remote, not docker mcp/github")
+    errors.append("github:docker")
+elif gh_url != "https://api.githubcopilot.com/mcp/":
+    print("  ✗ github must use https://api.githubcopilot.com/mcp/")
+    errors.append("github:url")
+elif "${env:GITHUB_PERSONAL_ACCESS_TOKEN}" not in gh_auth:
+    print("  ✗ github must interpolate ${env:GITHUB_PERSONAL_ACCESS_TOKEN} (no hardcoded token)")
+    errors.append("github:env")
+elif any(token in gh_auth for token in ("ghp_", "github_pat_")):
+    print("  ✗ github Authorization must not contain a hardcoded PAT")
+    errors.append("github:secret")
+else:
+    print("  ✓ github uses official remote + env interpolation")
 if errors:
     sys.exit(1)
 PYEOF
@@ -94,9 +111,11 @@ set -e
 if [ "$contract_rc" -eq 0 ]; then
     test_results+=("duckduckgo:NoTransportArg:PASS")
     test_results+=("memory:Launcher:PASS")
+    test_results+=("github:Remote:PASS")
 else
     test_results+=("duckduckgo:NoTransportArg:FAIL")
     test_results+=("memory:Launcher:FAIL")
+    test_results+=("github:Remote:FAIL")
     errors+=("Config contract checks failed")
 fi
 
@@ -124,8 +143,11 @@ try:
     server = config.get('mcpServers', {}).get(sys.argv[2], {})
     command = server.get('command', '')
     args = server.get('args', [])
+    url = server.get('url', '')
     
     print(f"command:{command}")
+    if url:
+        print(f"url:{url}")
     for arg in args:
         print(f"arg:{arg}")
 except Exception as e:
@@ -135,6 +157,7 @@ PYEOF
 )
     
     command=$(echo "$server_config" | grep "^command:" | cut -d: -f2-)
+    url=$(echo "$server_config" | grep "^url:" | cut -d: -f2-)
     
     if [ "$command" = "docker" ]; then
         # Check Docker
@@ -197,6 +220,14 @@ PYEOF
         if docker images "mcp/neo4j-memory" --format "{{.Repository}}:{{.Tag}}" 2>/dev/null | grep -q .; then
             echo "  ✓ Image exists locally: mcp/neo4j-memory"
             test_results+=("$server_name:Image Exists:PASS:mcp/neo4j-memory")
+        fi
+    elif [ -n "$url" ]; then
+        echo "  ✓ Remote/URL MCP: $url"
+        test_results+=("$server_name:Remote URL:PASS:$url")
+        if [ "$server_name" = "github" ] && [ "$url" != "https://api.githubcopilot.com/mcp/" ]; then
+            echo "  ✗ Unexpected GitHub remote URL" >&2
+            test_results+=("$server_name:Remote URL:FAIL:$url")
+            errors+=("$server_name: unexpected remote URL")
         fi
     else
         echo "  ⚠ Unknown command: $command"
